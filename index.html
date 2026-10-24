@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Sourdough workbench: baker's percentage calculator, saved recipes, levain builder, water temperature, bake schedule and troubleshooting. English and Hebrew.">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Levain Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=Heebo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#EEF0EA; --surface:#FBFCF8; --sunk:#E4E7DF; --ink:#1B201C; --muted:#5C655D; --line:#D3D8CD;
+  --accent:#27477A; --accent-soft:#DCE4F1; --on-accent:#FFFFFF;
+  --bread:#D8B467; --ww:#9A6232; --rye:#5A4535; --spelt:#B9925A; --water:#7FA6CF; --salt:#A9AFA6; --seed:#6E8B4E;
+  --good:#2F7A4B; --warn:#A8640F; --bad:#B23A2E; --warn-soft:#F6E8D2; --bad-soft:#F5DCD8;
+  --display:"Bricolage Grotesque", "Heebo", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Heebo", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+:root[lang="he"]{
+  --display:"Heebo", "Segoe UI", system-ui, sans-serif;
+  --body:"Heebo", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111412; --surface:#191D1A; --sunk:#0D0F0E; --ink:#E7EAE3; --muted:#99A299; --line:#2C322D;
+    --accent:#93B3E3; --accent-soft:#1E2B40; --on-accent:#0F1724;
+    --bread:#E0C07A; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
+    --good:#6CC28E; --warn:#E3A552; --bad:#EC8577; --warn-soft:#33281A; --bad-soft:#3A201C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111412; --surface:#191D1A; --sunk:#0D0F0E; --ink:#E7EAE3; --muted:#99A299; --line:#2C322D;
+  --accent:#93B3E3; --accent-soft:#1E2B40; --on-accent:#0F1724;
+  --bread:#E0C07A; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
+  --good:#6CC28E; --warn:#E3A552; --bad:#EC8577; --warn-soft:#33281A; --bad-soft:#3A201C;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);padding-inline:16px;padding-block:20px 48px}
+.app{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+.num,td.n,th.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.acc{color:var(--accent)}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{width:44px;height:44px;flex:none}
+.brand h1{font-size:1.75rem;font-weight:800;letter-spacing:-.02em}
+.brand p{color:var(--muted);font-size:.9rem}
+.toggles{display:flex;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--sunk);border-radius:10px;padding:3px;gap:2px;position:relative}
+.seg button,.seg label{border:0;background:transparent;color:var(--muted);font:600 .85rem var(--body);padding:6px 12px;border-radius:8px;cursor:pointer}
+.seg button[aria-pressed="true"],.seg input:checked+label{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0/.12)}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg button[data-lang="he"]{font-family:"Heebo",var(--body)}
+
+/* tabs */
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs button{flex:none;border:0;background:none;color:var(--muted);font:600 .95rem var(--body);padding:10px 14px;border-bottom:3px solid transparent;cursor:pointer;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button:hover{color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,tr:focus-visible,label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+
+.panel{display:flex;flex-direction:column;gap:20px}
+.lede{max-width:68ch;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+legend{font:700 .74rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:0;margin-bottom:8px}
+:root[lang="he"] legend,:root[lang="he"] th,:root[lang="he"] .stat span,:root[lang="he"] .label{letter-spacing:0}
+.inputs{display:flex;flex-direction:column;gap:18px}
+.inputs hr{border:0;border-top:1px solid var(--line);margin:0}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 120px;align-items:center;gap:10px}
+.row.wide{grid-template-columns:minmax(0,1fr) 170px}
+.row label{font-size:.92rem}
+.row label small{display:block;color:var(--muted);font-size:.78rem;line-height:1.3}
+.field{position:relative;display:flex;align-items:center}
+.field input,.field select,select.full{width:100%;font:500 .95rem var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+.field select,select.full{font-family:var(--body)}
+.field input[data-suffix]{padding-inline-end:38px}
+.field .sfx{position:absolute;inset-inline-end:10px;color:var(--muted);font:.82rem var(--mono);pointer-events:none}
+:root[lang="he"] .field .sfx{font-family:var(--body)}
+.field input[readonly]{background:var(--sunk);color:var(--muted)}
+input.plain,textarea.plain{width:100%;font:500 .95rem var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+textarea.plain{resize:vertical;min-height:64px;font-weight:400}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 .84rem var(--body);padding:6px 12px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+/* formula sheet */
+.sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stat{background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.stat span{font:700 .7rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stat b{font:500 1.35rem var(--mono);font-variant-numeric:tabular-nums}
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th{font:700 .72rem var(--body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:start;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line)}
+th.n,td.n{text-align:end;white-space:nowrap}
+tr.sub td{color:var(--muted);font-size:.86rem;padding-top:4px;padding-bottom:4px}
+tr.sub td:first-child{padding-inline-start:28px}
+tr.total td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
+td.mix{font-weight:600;color:var(--accent)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:8px;vertical-align:baseline}
+.bar{display:flex;height:16px;border-radius:6px;overflow:hidden;margin-top:16px;background:var(--sunk)}
+.bar div{height:100%;transition:width .25s}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:.8rem;color:var(--muted)}
+.notes{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.note{font-size:.88rem;padding:9px 12px;border-radius:8px;background:var(--sunk)}
+.note.warn{background:var(--warn-soft);color:var(--ink);border-inline-start:3px solid var(--warn)}
+.note.bad{background:var(--bad-soft);color:var(--ink);border-inline-start:3px solid var(--bad)}
+.note b{font-weight:600}
+
+.btn{border:0;background:var(--accent);color:var(--on-accent);font:600 .9rem var(--body);padding:9px 14px;border-radius:9px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+.btn.small{font-size:.82rem;padding:6px 10px}
+.btn.danger{background:var(--bad);color:var(--surface)}
+.analyze-out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.analyze-out div{background:var(--sunk);border-radius:10px;padding:10px 12px}
+.analyze-out span{display:block;font:700 .68rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.analyze-out b{font:500 1.15rem var(--mono)}
+
+/* saved recipes */
+.recipes{display:flex;flex-direction:column}
+.recipe{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.recipe .nm{font-weight:600;overflow-wrap:anywhere}
+.recipe .meta{font-size:.8rem;color:var(--muted)}
+.recipe .meta bdi{font-family:var(--mono)}
+.recipe .notes-txt{grid-column:1/-1;font-size:.86rem;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
+.recipe .acts{display:flex;gap:6px}
+.status{font-size:.86rem;color:var(--muted);min-height:1.2em}
+.status.ok{color:var(--good)}
+.status.err{color:var(--bad)}
+.store-note{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.store-note i{width:8px;height:8px;border-radius:50%;background:var(--salt);flex:none}
+.store-note.cloud i{background:var(--good)}
+
+/* big answer */
+.answer{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.answer .big{font:700 3.4rem/1 var(--display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.answer .label{font:700 .74rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.thermo-wrap{width:100%;direction:ltr}
+.thermo{width:100%;height:10px;border-radius:999px;background:linear-gradient(90deg,#5B8FD0,#8CC1A0 45%,#E2B653 70%,#D1553F);position:relative;margin-top:10px}
+.thermo i{position:absolute;top:-5px;width:4px;height:20px;border-radius:2px;background:var(--ink);transform:translateX(-2px);transition:left .25s}
+.thermo-scale{display:flex;justify-content:space-between;font:.75rem var(--mono);color:var(--muted);margin-top:6px;width:100%}
+
+/* recipe parts */
+.parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.parts div{border:1px solid var(--line);border-radius:10px;padding:12px}
+.parts span{display:block;font-size:.8rem;color:var(--muted)}
+.parts b{font:500 1.5rem var(--mono)}
+@media (max-width:420px){.parts b{font-size:1.15rem}}
+tr.pick{cursor:pointer}
+tr.pick:hover td{background:var(--sunk)}
+tr.pick.on td{background:var(--accent-soft)}
+
+/* timeline */
+.timeline{display:flex;flex-direction:column}
+.day{font:700 .74rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--accent);padding:14px 0 6px;border-bottom:1px solid var(--line)}
+:root[lang="he"] .day{letter-spacing:0;font-size:.85rem}
+.step{display:grid;grid-template-columns:72px 18px minmax(0,1fr);gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.step time{font:500 1rem var(--mono);font-variant-numeric:tabular-nums;padding-top:1px}
+.step .dot{width:12px;height:12px;border-radius:50%;margin-top:6px;border:2px solid var(--accent);background:var(--surface)}
+.step.key .dot{background:var(--accent)}
+.step.minor{padding:6px 0}
+.step.minor time,.step.minor .t{color:var(--muted);font-size:.9rem}
+.step.minor .dot{width:8px;height:8px;margin:7px 2px 0;border-color:var(--muted)}
+.step .t{font-weight:600}
+.step .d{color:var(--muted);font-size:.88rem}
+.pill{display:inline-block;font:600 .72rem var(--body);padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-inline-start:6px;vertical-align:1px}
+
+/* fix-it */
+.issues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.issues{grid-template-columns:minmax(0,1fr)}}
+details.issue{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0}
+details.issue summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+details.issue summary::-webkit-details-marker{display:none}
+details.issue summary h3{font-size:1rem}
+details.issue summary .tag{font:600 .7rem var(--body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);flex:none}
+details.issue .body{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;font-size:.92rem}
+details.issue .body h4{font:700 .72rem var(--body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0}
+details.issue ul{margin:0;padding-inline-start:18px;display:flex;flex-direction:column;gap:4px}
+details.issue[open]{border-color:var(--accent)}
+
+/* guide */
+.guide{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.guide{grid-template-columns:minmax(0,1fr)}}
+ol.process{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:14px}
+ol.process li{counter-increment:s;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px}
+ol.process li::before{content:counter(s);font:700 .9rem var(--mono);color:var(--accent);background:var(--accent-soft);border-radius:8px;height:28px;display:grid;place-items:center}
+ol.process b{display:block}
+ol.process p{color:var(--muted);font-size:.9rem}
+.signs{margin:0;padding-inline-start:18px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+footer{color:var(--muted);font-size:.8rem;max-width:70ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <ellipse cx="24" cy="28" rx="20" ry="13" fill="var(--bread)"/>
+        <path d="M8 27c3-9 10-14 16-14s13 5 16 14" fill="none" stroke="var(--ww)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M16 22c5-4 11-5 18-1" fill="none" stroke="var(--surface)" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>Levain Ledger</h1>
+        <p data-i18n="appSub"></p>
+      </div>
+    </div>
+    <div class="toggles">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="he" aria-pressed="false">עברית</button>
+      </div>
+      <div class="seg" role="group" aria-label="Temperature unit">
+        <button type="button" data-unit="C" aria-pressed="true">°C</button>
+        <button type="button" data-unit="F" aria-pressed="false">°F</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="formula" aria-selected="true" data-i18n="tFormula"></button>
+    <button role="tab" data-tab="recipes" aria-selected="false" data-i18n="tRecipes"></button>
+    <button role="tab" data-tab="levain" aria-selected="false" data-i18n="tLevain"></button>
+    <button role="tab" data-tab="water" aria-selected="false" data-i18n="tWater"></button>
+    <button role="tab" data-tab="schedule" aria-selected="false" data-i18n="tSchedule"></button>
+    <button role="tab" data-tab="fix" aria-selected="false" data-i18n="tFix"></button>
+    <button role="tab" data-tab="guide" aria-selected="false" data-i18n="tGuide"></button>
+  </nav>
+
+  <main>
+  <!-- FORMULA -->
+  <section class="panel" id="tab-formula" role="tabpanel">
+    <div class="stack" style="gap:10px">
+      <p class="lede" data-i18n="fLede"></p>
+      <div class="chips" id="presets"></div>
+    </div>
+    <div class="grid2">
+      <div class="stack">
+      <div class="card inputs">
+        <fieldset>
+          <legend data-i18n="lgBatch"></legend>
+          <div class="seg" role="radiogroup">
+            <input type="radio" name="mode" id="modeDough" value="dough" checked><label for="modeDough" data-i18n="modeDough"></label>
+            <input type="radio" name="mode" id="modeFlour" value="flour"><label for="modeFlour" data-i18n="modeFlour"></label>
+          </div>
+          <div id="doughModeFields" class="stack" style="gap:10px">
+            <div class="row"><label for="loaves"><span data-i18n="lLoaves"></span></label><div class="field"><input id="loaves" type="number" inputmode="decimal" min="1" step="1" value="2"></div></div>
+            <div class="row"><label for="loafWeight"><span data-i18n="lLoafW"></span><small data-i18n="sLoafW"></small></label><div class="field"><input id="loafWeight" type="number" inputmode="decimal" min="50" step="10" value="900" data-suffix><span class="sfx" data-i18n="g"></span></div></div>
+          </div>
+          <div id="flourModeFields" class="row" hidden><label for="flourTotal"><span data-i18n="lFlourTotal"></span><small data-i18n="sFlourTotal"></small></label><div class="field"><input id="flourTotal" type="number" inputmode="decimal" min="50" step="10" value="1000" data-suffix><span class="sfx" data-i18n="g"></span></div></div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgHyd"></legend>
+          <div class="row"><label for="hyd"><span data-i18n="lHyd"></span><small id="hydHint"></small></label><div class="field"><input id="hyd" type="number" inputmode="decimal" min="40" max="120" step="1" value="75" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="salt"><span data-i18n="lSalt"></span><small data-i18n="sSalt"></small></label><div class="field"><input id="salt" type="number" inputmode="decimal" min="0" max="5" step="0.1" value="2" data-suffix><span class="sfx">%</span></div></div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgLev"></legend>
+          <div class="row"><label for="lev"><span data-i18n="lLev"></span><small data-i18n="sLev"></small></label><div class="field"><input id="lev" type="number" inputmode="decimal" min="1" max="60" step="1" value="20" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="levHyd"><span data-i18n="lLevHyd"></span><small data-i18n="sLevHyd"></small></label><div class="field"><input id="levHyd" type="number" inputmode="decimal" min="40" max="200" step="5" value="100" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="levFlour"><span data-i18n="lLevFlour"></span></label><div class="field"><select id="levFlour">
+            <option value="bread" data-i18n="fl_bread"></option><option value="ww" data-i18n="fl_ww"></option><option value="rye" data-i18n="fl_rye"></option><option value="spelt" data-i18n="fl_spelt"></option>
+          </select></div></div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgBlend"></legend>
+          <div class="row"><label for="ww"><span data-i18n="fl_ww"></span></label><div class="field"><input id="ww" type="number" inputmode="decimal" min="0" max="100" step="5" value="10" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="rye"><span data-i18n="fl_rye"></span></label><div class="field"><input id="rye" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="spelt"><span data-i18n="fl_spelt"></span></label><div class="field"><input id="spelt" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="breadPct"><span data-i18n="fl_bread"></span><small data-i18n="sBread"></small></label><div class="field"><input id="breadPct" type="number" readonly tabindex="-1" value="90" data-suffix><span class="sfx">%</span></div></div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgInc"></legend>
+          <div class="row wide"><label for="incName"><span data-i18n="lIncName"></span></label><input id="incName" class="plain" type="text" value="" data-i18n-ph="phInc"></div>
+          <div class="row"><label for="inc"><span data-i18n="lInc"></span></label><div class="field"><input id="inc" type="number" inputmode="decimal" min="0" max="60" step="1" value="0" data-suffix><span class="sfx">%</span></div></div>
+        </fieldset>
+      </div>
+      </div>
+
+      <div class="stack">
+        <div class="stats">
+          <div class="stat"><span data-i18n="stDoughL"></span><b id="stDough">–</b></div>
+          <div class="stat"><span data-i18n="stFlourL"></span><b id="stFlour">–</b></div>
+          <div class="stat"><span data-i18n="stLevL"></span><b id="stLev">–</b></div>
+          <div class="stat"><span data-i18n="stPffL"></span><b id="stPff">–</b></div>
+        </div>
+        <div class="card">
+          <div class="sheet-head">
+            <h2 id="sheetTitle"></h2>
+            <span class="muted small" data-i18n-html="sheetHint"></span>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th data-i18n="thIng"></th><th class="n" data-i18n="thPct"></th><th class="n" data-i18n="thTotal"></th><th class="n" data-i18n="thMix"></th></tr></thead>
+              <tbody id="sheet"></tbody>
+            </table>
+          </div>
+          <div class="bar" id="bar"></div>
+          <div class="legend" id="legend"></div>
+          <div class="notes" id="notes"></div>
+        </div>
+
+        <div class="card stack" id="saveCard">
+          <div>
+            <h3 data-i18n="rSaveTitle"></h3>
+            <p class="muted small" data-i18n="rSaveDesc"></p>
+          </div>
+          <div class="stack" style="gap:10px">
+            <div class="stack" style="gap:4px"><label for="rName" class="small" data-i18n="rNameL"></label><input id="rName" class="plain" type="text" maxlength="80" data-i18n-ph="rNamePh"></div>
+            <div class="stack" style="gap:4px"><label for="rNotes" class="small" data-i18n="rNotesL"></label><textarea id="rNotes" class="plain" maxlength="2000" data-i18n-ph="rNotesPh"></textarea></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="btn" type="button" id="rSave" data-i18n="rSave"></button>
+            <span class="status" id="rStatus" role="status"></span>
+          </div>
+          <div class="store-note" id="storeNote"><i></i><span></span></div>
+        </div>
+
+        <div class="card stack">
+          <div>
+            <h3 data-i18n="aTitle"></h3>
+            <p class="muted small" data-i18n="aDesc"></p>
+          </div>
+          <div class="stack" style="gap:10px">
+            <div class="row"><label for="aFlour"><span data-i18n="aFlourL"></span></label><div class="field"><input id="aFlour" type="number" inputmode="decimal" min="0" value="450" data-suffix><span class="sfx" data-i18n="g"></span></div></div>
+            <div class="row"><label for="aWater"><span data-i18n="aWaterL"></span></label><div class="field"><input id="aWater" type="number" inputmode="decimal" min="0" value="350" data-suffix><span class="sfx" data-i18n="g"></span></div></div>
+            <div class="row"><label for="aStarter"><span data-i18n="aStarterL"></span></label><div class="field"><input id="aStarter" type="number" inputmode="decimal" min="0" value="100" data-suffix><span class="sfx" data-i18n="g"></span></div></div>
+            <div class="row"><label for="aStarterHyd"><span data-i18n="aStarterHydL"></span></label><div class="field"><input id="aStarterHyd" type="number" inputmode="decimal" min="40" max="200" value="100" data-suffix><span class="sfx">%</span></div></div>
+            <div class="row"><label for="aSalt"><span data-i18n="aSaltL"></span></label><div class="field"><input id="aSalt" type="number" inputmode="decimal" min="0" step="0.5" value="10" data-suffix><span class="sfx" data-i18n="g"></span></div></div>
+          </div>
+          <div class="analyze-out">
+            <div><span data-i18n="lHyd"></span><b id="aHyd">–</b></div>
+            <div><span data-i18n="lSalt"></span><b id="aSaltPct">–</b></div>
+            <div><span data-i18n="lLev"></span><b id="aLevPct">–</b></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn ghost" type="button" id="aLoad" data-i18n="aLoad"></button><span class="muted small" id="aMsg" role="status"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECIPES -->
+  <section class="panel" id="tab-recipes" role="tabpanel" hidden>
+    <p class="lede" data-i18n="rLede"></p>
+    <div class="card">
+      <div class="sheet-head"><h2 data-i18n="tRecipes"></h2><div class="store-note" id="storeNote2"><i></i><span></span></div></div>
+      <div class="recipes" id="recipeList"></div>
+    </div>
+  </section>
+
+  <!-- LEVAIN -->
+  <section class="panel" id="tab-levain" role="tabpanel" hidden>
+    <p class="lede" data-i18n="lvLede"></p>
+    <div class="grid2">
+      <div class="card inputs">
+        <fieldset>
+          <legend data-i18n="lgHowMuch"></legend>
+          <div class="row"><label for="levNeed"><span data-i18n="lLevNeed"></span><small data-i18n="sLevNeed"></small></label><div class="field"><input id="levNeed" type="number" readonly tabindex="-1" data-suffix><span class="sfx" data-i18n="g"></span></div></div>
+          <div class="row"><label for="levKeep"><span data-i18n="lLevKeep"></span><small data-i18n="sLevKeep"></small></label><div class="field"><input id="levKeep" type="number" inputmode="decimal" min="0" step="5" value="25" data-suffix><span class="sfx" data-i18n="g"></span></div></div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgRatio"></legend>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:ltr">
+            <div class="field"><input id="rS" type="number" inputmode="decimal" min="0.1" step="1" value="1" aria-label="Starter"></div>
+            <div class="field"><input id="rF" type="number" inputmode="decimal" min="0.1" step="1" value="2" aria-label="Flour"></div>
+            <div class="field"><input id="rW" type="number" inputmode="decimal" min="0.1" step="1" value="2" aria-label="Water"></div>
+          </div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgCond"></legend>
+          <div class="row"><label for="levTemp"><span data-i18n="lLevTemp"></span></label><div class="field"><input id="levTemp" class="temp" type="number" inputmode="decimal" step="0.5" value="24" data-suffix><span class="sfx tsfx">°C</span></div></div>
+          <div class="row"><label for="levFeedAt"><span data-i18n="lLevFeedAt"></span></label><div class="field"><input id="levFeedAt" type="time" value="21:00"></div></div>
+        </fieldset>
+      </div>
+      <div class="stack">
+        <div class="card stack">
+          <div class="sheet-head" style="margin:0"><h2><span data-i18n="buildTitle"></span> <span class="num" id="levTotal">–</span></h2><span class="muted small" id="levHydNote"></span></div>
+          <div class="parts">
+            <div><span data-i18n="pSL"></span><b id="pS">–</b></div>
+            <div><span data-i18n="pFL"></span><b id="pF">–</b></div>
+            <div><span data-i18n="pWL"></span><b id="pW">–</b></div>
+          </div>
+          <div class="answer">
+            <span class="label" data-i18n="peakL"></span>
+            <span class="big" id="levReady">–</span>
+            <span class="muted" id="levReadyNote"></span>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:4px" id="ratioTitle"></h3>
+          <p class="muted small" style="margin-bottom:10px" data-i18n="ratiosDesc"></p>
+          <div class="tablewrap"><table>
+            <thead><tr><th data-i18n="thRatio"></th><th class="n" data-i18n="thStarter"></th><th class="n" data-i18n="pFL"></th><th class="n" data-i18n="pWL"></th><th class="n" data-i18n="thPeak"></th></tr></thead>
+            <tbody id="ratioTable"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:8px" data-i18n="readyT"></h3>
+          <ul class="signs" data-i18n-list="readyList"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WATER TEMP -->
+  <section class="panel" id="tab-water" role="tabpanel" hidden>
+    <p class="lede" data-i18n="wLede"></p>
+    <div class="grid2">
+      <div class="card inputs">
+        <fieldset>
+          <legend data-i18n="lgTarget"></legend>
+          <div class="row"><label for="ddt"><span data-i18n="lDdt"></span><small data-i18n="sDdt"></small></label><div class="field"><input id="ddt" class="temp" type="number" inputmode="decimal" step="0.5" value="25" data-suffix><span class="sfx tsfx">°C</span></div></div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgMeasured"></legend>
+          <div class="row"><label for="tRoom"><span data-i18n="lRoom"></span></label><div class="field"><input id="tRoom" class="temp" type="number" inputmode="decimal" step="0.5" value="22" data-suffix><span class="sfx tsfx">°C</span></div></div>
+          <div class="row"><label for="tFlour"><span data-i18n="pFL"></span></label><div class="field"><input id="tFlour" class="temp" type="number" inputmode="decimal" step="0.5" value="21" data-suffix><span class="sfx tsfx">°C</span></div></div>
+          <div class="row"><label for="tLev"><span data-i18n="lLev"></span></label><div class="field"><input id="tLev" class="temp" type="number" inputmode="decimal" step="0.5" value="24" data-suffix><span class="sfx tsfx">°C</span></div></div>
+          <div class="row wide"><label for="friction"><span data-i18n="lMix"></span></label><div class="field"><select id="friction">
+            <option value="1.5"></option><option value="0"></option><option value="13"></option><option value="15"></option>
+          </select></div></div>
+        </fieldset>
+      </div>
+      <div class="card stack">
+        <div class="answer">
+          <span class="label" data-i18n="waterL"></span>
+          <span class="big" id="waterOut">–</span>
+          <div class="thermo-wrap" aria-hidden="true">
+            <div class="thermo"><i id="thermoMark"></i></div>
+            <div class="thermo-scale"><span id="tsLo">0°C</span><span id="tsHi">45°C</span></div>
+          </div>
+        </div>
+        <div class="notes" id="waterNotes"></div>
+        <p class="muted small" data-i18n="wFormula"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section class="panel" id="tab-schedule" role="tabpanel" hidden>
+    <p class="lede" data-i18n="sLede"></p>
+    <div class="grid2">
+      <div class="card inputs">
+        <fieldset>
+          <legend data-i18n="lgPlan"></legend>
+          <div class="seg" role="radiogroup">
+            <input type="radio" name="anchor" id="anchorStart" value="start" checked><label for="anchorStart" data-i18n="anchorStart"></label>
+            <input type="radio" name="anchor" id="anchorReady" value="ready"><label for="anchorReady" data-i18n="anchorReady"></label>
+          </div>
+          <div class="field"><input id="schAt" type="datetime-local"></div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgFerm"></legend>
+          <div class="row"><label for="schTemp"><span data-i18n="lSchTemp"></span></label><div class="field"><input id="schTemp" class="temp" type="number" inputmode="decimal" step="0.5" value="25" data-suffix><span class="sfx tsfx">°C</span></div></div>
+          <div class="row"><label for="schBulk"><span data-i18n="lSchBulk"></span><small id="bulkAuto"></small></label><div class="field"><input id="schBulk" type="number" inputmode="decimal" min="1" max="24" step="0.25" data-i18n-ph="phAuto" data-suffix><span class="sfx" data-i18n="h"></span></div></div>
+          <div class="row"><label for="schAutolyse"><span data-i18n="lAutolyse"></span></label><div class="field"><select id="schAutolyse"><option value="0" data-i18n="aNone"></option><option value="30" data-i18n="a30"></option><option value="60" selected data-i18n="a60"></option><option value="120" data-i18n="a120"></option></select></div></div>
+          <div class="row"><label for="schFolds"><span data-i18n="lFolds"></span></label><div class="field"><input id="schFolds" type="number" inputmode="decimal" min="0" max="8" step="1" value="4"></div></div>
+          <div class="row"><label for="schFoldGap"><span data-i18n="lFoldGap"></span></label><div class="field"><input id="schFoldGap" type="number" inputmode="decimal" min="10" max="90" step="5" value="30" data-suffix><span class="sfx" data-i18n="min"></span></div></div>
+        </fieldset>
+        <hr>
+        <fieldset>
+          <legend data-i18n="lgProof"></legend>
+          <div class="row"><label for="schRetard"><span data-i18n="lRetard"></span><small data-i18n="sRetard"></small></label><div class="field"><input id="schRetard" type="number" inputmode="decimal" min="0" max="72" step="1" value="14" data-suffix><span class="sfx" data-i18n="h"></span></div></div>
+          <div class="row"><label for="schCool"><span data-i18n="lCool"></span></label><div class="field"><input id="schCool" type="number" inputmode="decimal" min="30" step="15" value="120" data-suffix><span class="sfx" data-i18n="min"></span></div></div>
+        </fieldset>
+      </div>
+      <div class="card">
+        <div class="sheet-head"><h2 data-i18n="tlTitle"></h2><span class="muted small" id="schSummary"></span></div>
+        <div class="timeline" id="timeline"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TROUBLESHOOT -->
+  <section class="panel" id="tab-fix" role="tabpanel" hidden>
+    <p class="lede" data-i18n="fixLede"></p>
+    <div class="chips" id="fixFilters"></div>
+    <div class="issues" id="issues"></div>
+  </section>
+
+  <!-- GUIDE -->
+  <section class="panel" id="tab-guide" role="tabpanel" hidden>
+    <div class="guide">
+      <div class="card stack">
+        <h2 data-i18n="gProcT"></h2>
+        <ol class="process" id="process"></ol>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h3 style="margin-bottom:10px" data-i18n="hydT"></h3>
+          <div class="tablewrap"><table>
+            <thead><tr><th data-i18n="pFL"></th><th class="n" data-i18n="thTyp"></th><th data-i18n="thWhy"></th></tr></thead>
+            <tbody id="hydTable"></tbody>
+          </table></div>
+          <p class="muted small" style="margin-top:10px" data-i18n="hydTip"></p>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:10px" data-i18n="bulkT"></h3>
+          <ul class="signs" data-i18n-list="bulkList"></ul>
+          <p class="muted small" style="margin-top:10px" data-i18n="bulkTip"></p>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:10px" data-i18n="pokeT"></h3>
+          <ul class="signs" data-i18n-list="pokeList"></ul>
+          <p class="muted small" style="margin-top:10px" data-i18n="pokeTip"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <footer data-i18n="footer"></footer>
+</div>
+
+<script>
+(function(){
+/* ================= strings ================= */
+const STR = {
+en: {
+  appSub: "Baker's percentages, levain builds, timing and fixes for sourdough",
+  tFormula: 'Formula', tRecipes: 'My recipes', tLevain: 'Levain build', tWater: 'Water temp', tSchedule: 'Bake schedule', tFix: 'Troubleshoot', tGuide: 'Method',
+  g: 'g', h: 'h', min: 'min',
+  fLede: "In baker's math, flour is always 100% and every other ingredient is a percentage of the flour weight. Totals here count the flour and water inside your levain, so the hydration you set is the true hydration of the dough.",
+  presets: ['Country loaf', 'First loaf (70%)', 'Open crumb', '50% whole wheat', 'Rye country', 'Seeded'],
+  seedMix: 'Toasted seed mix',
+  lgBatch: 'Batch size', modeDough: 'By dough weight', modeFlour: 'By flour weight',
+  lLoaves: 'Loaves', lLoafW: 'Dough per loaf', sLoafW: '~900 g fits a 9–10" banneton',
+  lFlourTotal: 'Total flour', sFlourTotal: 'including flour in the levain',
+  lgHyd: 'Hydration and salt', lHyd: 'Hydration', hydHint: 'Typical for this blend: {lo}–{hi}%', lSalt: 'Salt', sSalt: '1.8–2.2% is the usual range',
+  lgLev: 'Levain', lLev: 'Levain', sLev: 'Levain weight as % of total flour', lLevHyd: 'Levain hydration', sLevHyd: '100% = equal flour and water', lLevFlour: 'Levain is fed with',
+  fl_bread: 'Bread flour', fl_ww: 'Whole wheat', fl_rye: 'Rye', fl_spelt: 'Spelt',
+  lgBlend: 'Flour blend', sBread: 'The rest of the blend',
+  lgInc: 'Inclusions (optional)', lIncName: 'What', phInc: 'Seeds, olives, cheese…', lInc: 'Amount',
+  stDoughL: 'Total dough', stFlourL: 'Total flour', stLevL: 'Levain needed', stPffL: 'Prefermented flour',
+  sheetTitle: 'Formula sheet', sheetTitleN: 'Formula sheet · {n} × {w}',
+  sheetHint: 'Weigh the <b class="acc">Add to bowl</b> column',
+  thIng: 'Ingredient', thPct: "Baker's %", thTotal: 'Total', thMix: 'Add to bowl',
+  water: 'Water', salt: 'Salt', inclusions: 'Inclusions', levain: 'Levain', levHydSfx: '({h} hydration)', inTotals: 'in totals', flourInLev: 'flour in levain', waterInLev: 'water in levain', totalDough: 'Total dough',
+  nBlendOver: '<b>Blend is over 100%.</b> Whole wheat, rye and spelt add up to more than all the flour. Lower one of them.',
+  nLevFlour: '<b>The levain uses more {f} than the formula has.</b> Lower the levain %, raise {f} in the blend, or feed the levain with a different flour.',
+  nLevWater: '<b>The levain brings more water than the whole dough needs.</b> Raise hydration or lower levain %.',
+  nWet: '<b>Wetter than usual for this blend.</b> Expect a slack dough. Hold back some water and add it after the first folds if it feels too loose.',
+  nDry: '<b>Drier than usual for this blend.</b> Fine for a tighter crumb or sandwich loaf, but whole grains may feel stiff.',
+  nSaltHi: '<b>Salt above 2.5%</b> will taste salty and slow fermentation noticeably.',
+  nSaltLo: '<b>Salt below 1.6%</b> can taste flat and the dough will ferment faster.',
+  nLevHi: '<b>High levain.</b> Bulk will be fast and the flavor more sour. Good for cold kitchens.',
+  nLevLo: '<b>Low levain.</b> Expect a long bulk. Good for hot kitchens or overnight bulk.',
+  nTip: '<b>Tip:</b> hold back about {g} of the water and add it with the salt. It helps dissolve the salt and gives you a way to adjust if the dough feels too wet.',
+  aTitle: 'Check a recipe you found', aDesc: 'Enter the grams from any recipe to see its real hydration, salt and levain percentages, then load it into the calculator to scale it.',
+  aFlourL: 'Flour', aWaterL: 'Water', aStarterL: 'Starter or levain', aStarterHydL: 'Starter hydration', aSaltL: 'Salt',
+  aLoad: 'Load into calculator', aNeedFlour: 'Enter the flour weight first.', aLoaded: 'Loaded. Switch to "By dough weight" to scale it.',
+  rSaveTitle: 'Save this recipe', rSaveDesc: 'Keep the formula above with a name and notes. Find it later under My recipes.',
+  rNameL: 'Recipe name', rNamePh: 'Sunday country loaf', rNotesL: 'Notes (optional)', rNotesPh: 'Bulk 5 h at 25°C, great ear…',
+  rSave: 'Save recipe', rSaving: 'Saving…', rSaved: 'Saved "{n}".', rUpdated: 'Updated "{n}".', rNeedName: 'Give the recipe a name first.',
+  rLede: 'Recipes you saved from the Formula tab. Load one to bake it again or adjust it. Saving with the same name updates it.',
+  rEmpty: 'No saved recipes yet. Set up a formula, give it a name and press Save recipe.',
+  rLoad: 'Load', rDelete: 'Delete', rConfirm: 'Confirm', rLoadedMsg: 'Loaded "{n}".', rDeleted: 'Recipe deleted.',
+  rMeta: '{hyd} hydration · {lev} levain · {w} · saved {date}',
+  rCloud: 'Saved to your claude.ai account. Only you can see them.', rLocal: 'Saved in this browser only. Recipes stay on this device.',
+  rLoading: 'Connecting to your account…',
+  rError: "Couldn't save: {m}", rQuota: 'Storage is full. Delete an old recipe and try again.', rDelError: "Couldn't delete. Try again.",
+  lvLede: 'Build only the levain you need. A higher feeding ratio takes longer to peak and tastes milder; a lower ratio is faster and tangier. Times assume a healthy starter that doubles within 4–6 hours of a 1:1:1 feed.',
+  lgHowMuch: 'How much', lLevNeed: 'For the formula', sLevNeed: 'From the Formula tab', lLevKeep: 'Extra', sLevKeep: 'To keep as starter, plus jar loss',
+  lgRatio: 'Feeding ratio (starter : flour : water)', lgCond: 'Conditions', lLevTemp: 'Where it ferments', lLevFeedAt: 'Fed at',
+  buildTitle: 'Build', buildHyd: 'Build hydration ≈ {h}% (with a 100% starter)', buildHydExp: ' · the formula expects {h}%',
+  pSL: 'Ripe starter', pFL: 'Flour', pWL: 'Water', peakL: 'Expected peak',
+  peakNote: 'About {d} after feeding{nd}. Check from {t}.', nextDay: ' (next day)',
+  ratiosAt: 'Ratios at {t}', ratiosDesc: 'Pick a ratio that peaks when you plan to mix. Tap a row to use it.',
+  thRatio: 'Ratio', thStarter: 'Starter', thPeak: 'Peak in',
+  readyT: "Signs it's ready to use",
+  readyList: ['Roughly doubled (or tripled) since feeding, with a domed or just-flattening top.', 'Bubbles all the way through the jar, not just on top.', 'Smells pleasantly sour and yeasty, like yogurt or beer. Sharp acetone means it peaked a while ago.', 'The float test only works for stiffer, wheat-based levains. Rye and wet levains can sink even when ready.'],
+  wLede: 'Dough temperature is the biggest lever on fermentation speed. Pick a target dough temperature, measure your ingredients, and this tells you how warm or cool the mixing water should be.',
+  lgTarget: 'Target', lDdt: 'Desired dough temp', sDdt: '24–26°C (76–78°F) is typical', lgMeasured: 'Measured temperatures', lRoom: 'Room', lMix: 'Mixing',
+  friction: { '1.5': 'By hand', '0': 'No-knead / folds only', '13': 'Stand mixer', '15': 'Spiral mixer' }, frFmt: '{l} (friction {d})',
+  waterL: 'Mixing water temperature',
+  wFormula: 'Formula: water = (target × 4) − room − flour − levain − friction factor. The friction factor accounts for heat from mixing.',
+  wHot: '<b>Too hot for comfort.</b> Water above about {t} can stress the levain. Cap it there, then keep the dough somewhere warm (an oven with only the light on works) to make up the difference.',
+  wCold: '<b>Colder than tap water gets.</b> Use ice water and chilled flour, or accept a warmer dough and shorten bulk.',
+  wCool: '<b>Cold water needed.</b> Mix in a few ice cubes and stir before weighing.',
+  wEasy: '<b>Easy to hit.</b> Mix hot and cold tap water and check with a probe thermometer.',
+  wCheck: "Take the dough's temperature right after mixing. Each degree Celsius off target changes bulk time by roughly 8%.",
+  sLede: 'A timeline built from your dough temperature, levain percentage and flour blend. Bulk times are estimates. Watch the dough and use the target rise as your real signal.',
+  lgPlan: 'Plan around', anchorStart: 'Start mixing at', anchorReady: 'Bread ready by',
+  lgFerm: 'Fermentation', lSchTemp: 'Dough temp', lSchBulk: 'Bulk time', bulkEst: 'Estimate: {d}', phAuto: 'auto',
+  lAutolyse: 'Autolyse', aNone: 'None', a30: '30 min', a60: '1 hour', a120: '2 hours', lFolds: 'Sets of folds', lFoldGap: 'Every',
+  lgProof: 'Proof and bake', lRetard: 'Cold proof in fridge', sRetard: 'Better flavor and easier scoring', lCool: 'Cool before slicing',
+  tlTitle: 'Timeline', tlSummary: '{d} from feeding to slicing', pickDate: 'Pick a date and time.',
+  dayToday: 'Today', dayTomorrow: 'Tomorrow', dayYesterday: 'Yesterday',
+  sFeed: 'Feed the levain ({r})', sFeedD: '{g} total. Keep it around {t}. It should peak in about {d}.',
+  sAuto: 'Mix flour and water (autolyse)', sAutoD: '{f} flour with {w} water. Cover and rest.',
+  sAddLev: 'Add levain, then salt', sAddLevD: '{l} levain, then {s} salt with the held-back water. Pinch and fold until combined. Aim for {t} dough.',
+  sMixAll: 'Mix everything', sMixAllD: 'Levain, water, flour, then salt. Aim for {t} dough.',
+  sFold: 'Stretch and fold, set {i} of {n}', sFoldInc: 'Laminate or fold in the {x} now.', sFoldLast: 'Then leave the dough alone, covered.',
+  sBulkEnd: 'End of bulk, preshape', risePill: '~{p}% rise', sBulkEndD: 'Bulk ≈ {d} at {t}. Go by the dough: domed, jiggly, bubbles on the sides. Preshape into a round and rest 20–30 min uncovered.',
+  sShape: 'Final shape', sShapeD: 'Shape tight, then into a floured banneton seam-side up.',
+  sFridge: 'Into the fridge', sFridgeD: 'Cover and cold proof about {h} h at 3–5°C (38–41°F).',
+  sRoomProof: 'Proof at room temperature', sRoomProofD: 'About {d}. Use the poke test.',
+  sPreheat: 'Preheat oven with the Dutch oven inside', sPreheatD: '{t} for a full hour so the pot is properly hot.',
+  sBake: 'Score and bake, lid on', sBakeD: 'Straight from the fridge onto parchment. Score about 1 cm deep at a shallow angle. 20 min covered at {t}.',
+  sLidOff: 'Lid off', sLidOffD: 'Drop to {t}. Bake 20–25 min more until deep brown. Inside should read {a}–{b}.',
+  sOut: 'Out of the oven, onto a rack', sOutD: 'The crumb is still setting. Let it cool.', sSlice: 'Slice',
+  fixLede: 'Most sourdough problems come down to fermentation (too little or too much), gluten strength, or heat. Open a symptom to see what usually causes it and what to change next bake. Change one thing at a time.',
+  causesH: 'Likely causes', fixH: 'Try next time',
+  cats: { All: 'All', Crumb: 'Crumb', Shape: 'Shape', Crust: 'Crust', Flavor: 'Flavor', Dough: 'Dough', Starter: 'Starter' },
+  gProcT: 'The process, start to finish', hydT: 'Hydration by flour', thTyp: 'Typical hydration', thWhy: 'Why',
+  hydRows: [['All-purpose', '65–70%', 'Less protein, gets slack fast'], ['Bread flour', '70–78%', 'Strong gluten, the easy baseline'], ['+20% whole wheat', '75–82%', 'Bran soaks up more water'], ['50%+ whole wheat', '80–88%', 'Needs extra water and a longer soak'], ['Rye heavy (40%+)', '80–90%', 'Pentosans hold water; dough is pasty'], ['Spelt', '65–72%', 'Weaker, extensible gluten']],
+  hydTip: 'New to sourdough? Start at 68–72% with bread flour. Wet doughs are harder to shape, and a well-fermented 70% loaf beats a poorly handled 85% one.',
+  bulkT: 'How to tell bulk is done',
+  bulkList: ['Volume up by the target rise shown in your schedule. A straight-sided container with a rubber band makes this easy to read.', 'Domed, slightly puffy top that pulls away cleanly from the container edges.', 'Bubbles on the surface and along the sides; a jiggle when you shake the container.', 'The dough feels airy and lighter, no longer dense and tight.'],
+  bulkTip: 'An aliquot jar helps: put a small piece of dough in a shot glass right after mixing and track its rise.',
+  pokeT: 'Poke test (final proof)',
+  pokeList: ['<b>Springs back fast:</b> underproofed. Give it more time.', '<b>Springs back slowly, leaves a small dent:</b> ready to bake.', "<b>Doesn't spring back:</b> overproofed. Bake right away, maybe in a loaf pan."],
+  pokeTip: 'Cold dough straight from the fridge springs back slower, so read the test more loosely after a cold proof.',
+  footer: 'Fermentation times are estimates based on common home-baking rules of thumb: about 8% faster per extra degree Celsius, faster with more levain and whole grain. Every starter is different, so log your results and adjust.',
+  process: [
+    ['Feed the levain', 'Build fresh levain from your starter so it peaks when you mix. See the Levain build tab.'],
+    ['Autolyse (optional)', 'Mix flour and most of the water, rest 30–60 min. Gluten starts forming on its own and the dough gets easier to handle.'],
+    ['Mix', 'Add ripe levain, then salt with the held-back water. Squeeze and fold until fully combined. Check the dough temperature.'],
+    ['Bulk fermentation with folds', 'Do 3–4 sets of stretch-and-folds or coil folds every 30 min, then leave it. Bulk ends on volume rise and feel, not the clock.'],
+    ['Preshape and bench rest', 'Turn out, gently round it, rest 20–30 min until it relaxes and spreads slightly.'],
+    ['Final shape', 'Build surface tension into a boule or batard, then place seam-up in a floured banneton. Rice flour prevents sticking.'],
+    ['Proof', 'Cold proof 8–48 h in the fridge for flavor and easy scoring, or 1–3 h at room temperature.'],
+    ['Bake', 'Preheat a Dutch oven at {hot} for an hour. Score, bake 20 min covered, then 20–25 min uncovered at {mid} until deep brown.'],
+    ['Cool', 'Wait at least 1–2 hours. The inside is still cooking, and cutting early makes the crumb gummy.'],
+  ],
+  issues: [
+    ['Crumb', 'Dense, tight, gummy crumb', ['Underfermented: bulk ended too early or the dough was too cold', 'Weak or sluggish starter', 'Sliced while still hot'], ['Extend bulk until you see the target rise and a domed, jiggly dough', 'Raise dough temperature to 24–26°C (76–78°F)', 'Feed the starter twice a day for a few days before baking', 'Cool at least 1–2 hours before slicing']],
+    ['Crumb', 'Big holes under the crust, dense below', ['Underproofed, often called "fool\'s crumb"', 'Not enough strength built during folds', 'Too much flour trapped while shaping'], ['Longer bulk or a slightly warmer dough', 'Add one or two sets of folds', 'Shape with as little dusting flour as possible']],
+    ['Crumb', 'Uneven, irregular tunnels', ['Air pockets trapped while shaping', 'Pockets of dry flour from incomplete mixing'], ['Degas gently during preshape', 'Mix until no dry bits remain before bulk starts']],
+    ['Shape', 'Flat loaf that spreads out', ['Overfermented: bulk or proof went too long or too warm', 'Too much water for the flour', 'Weak shaping, not enough surface tension'], ['Shorten bulk or stop at a smaller rise', 'Drop hydration 3–5%', 'Use a cold proof so the dough holds its shape', 'Practice a tighter final shape']],
+    ['Shape', 'No oven spring, no ear', ['Overproofed', 'Scoring too shallow or too vertical', 'Oven or Dutch oven not hot enough', 'Not enough steam'], ['Do the poke test and bake earlier', 'Score about 1 cm deep at a 30–45° angle with one confident stroke', 'Preheat the pot a full hour', 'Keep the lid on for the first 20 minutes']],
+    ['Shape', 'Loaf bursts on the side', ['Underproofed', 'Score too shallow, so the loaf found its own weak spot'], ['Give a little more proof', 'Score deeper and longer']],
+    ['Crust', 'Pale crust', ['Overfermented: yeast and bacteria ate the sugars', 'Oven too cool or bake too short', 'Lid left on too long'], ['Shorten fermentation', 'Bake longer with the lid off until deep brown', 'Check your oven with an oven thermometer']],
+    ['Crust', 'Burnt bottom', ['Pot sitting too close to the bottom element', 'Dark pot absorbs too much heat'], ['Move the rack up one level', 'Put a baking sheet on the rack below', 'Slide a few tablespoons of semolina or a second parchment under the loaf']],
+    ['Crust', 'Thick, hard crust', ['Baked too long uncovered', 'Low hydration dough'], ['Pull the loaf at 96–98°C (205–208°F) internal', 'Raise hydration slightly']],
+    ['Flavor', 'Too sour', ['Long, warm fermentation', 'Starter used past its peak', 'Lots of whole grain or rye in the levain'], ['Use the levain right at peak, not after', 'Use a higher feed ratio like 1:5:5', 'Shorter cold proof']],
+    ['Flavor', 'Not sour enough', ['Young levain', 'Short fermentation at warm temperature'], ['Use a stiffer levain (50–60% hydration)', 'Feed the levain with some rye or whole wheat', 'Extend the cold proof to 24–48 hours']],
+    ['Dough', "Sticky, soupy dough that won't hold shape", ['Hydration too high for the flour', 'Overfermented: gluten is breaking down', 'Not enough strength built'], ['Hold back 5–10% of the water next time', 'Use stronger bread flour', 'Do coil folds or a few minutes of slap and fold', 'Use wet hands, not floured hands, during folds']],
+    ['Dough', 'Dough tears when folding', ['Too stiff or too much handling early', 'Not enough rest between folds'], ['Autolyse 30–60 minutes before adding levain', 'Wait longer between sets so the gluten relaxes']],
+    ['Starter', 'Starter not rising', ['Too cold', 'Fed too often for its current strength', 'Chlorinated water or bleached flour'], ['Keep it at 24–27°C (75–80°F)', 'Add 10–20% whole rye or whole wheat to its food', 'Use filtered or rested tap water', 'Feed 1:1:1 and give it a week of steady feeds']],
+    ['Starter', 'Liquid layer on top (hooch)', ['Hungry starter, past its peak'], ['Pour it off (milder) or stir it in (more sour) and feed', 'Feed more often or at a higher ratio']],
+  ],
+},
+he: {
+  appSub: 'אחוזי אופה, הכנת מחמצת, תזמון ופתרון בעיות ללחם מחמצת',
+  tFormula: 'מתכון', tRecipes: 'המתכונים שלי', tLevain: 'הכנת מחמצת', tWater: 'טמפ׳ מים', tSchedule: 'לוח זמנים', tFix: 'פתרון בעיות', tGuide: 'שיטה',
+  g: 'ג׳', h: 'ש׳', min: 'דק׳',
+  fLede: 'באחוזי אופה, הקמח הוא תמיד 100% וכל מרכיב אחר מחושב כאחוז ממשקל הקמח. הסכומים כאן כוללים את הקמח והמים שבתוך המחמצת, כך שההידרציה שתגדירו היא ההידרציה האמיתית של הבצק.',
+  presets: ['לחם כפרי', 'כיכר ראשונה (70%)', 'פירורית פתוחה', '50% קמח מלא', 'כפרי עם שיפון', 'עם זרעים'],
+  seedMix: 'תערובת זרעים קלויה',
+  lgBatch: 'גודל האפייה', modeDough: 'לפי משקל בצק', modeFlour: 'לפי משקל קמח',
+  lLoaves: 'כיכרות', lLoafW: 'בצק לכיכר', sLoafW: 'כ-900 ג׳ מתאים לבנטון בקוטר 23–25 ס״מ',
+  lFlourTotal: 'סך הקמח', sFlourTotal: 'כולל הקמח שבמחמצת',
+  lgHyd: 'הידרציה ומלח', lHyd: 'הידרציה', hydHint: 'טיפוסי לתערובת הזו: {lo}–{hi}%', lSalt: 'מלח', sSalt: 'הטווח המקובל: 1.8–2.2%',
+  lgLev: 'מחמצת (לבאן)', lLev: 'מחמצת', sLev: 'משקל המחמצת כאחוז מסך הקמח', lLevHyd: 'הידרציית מחמצת', sLevHyd: '100% = קמח ומים במשקל שווה', lLevFlour: 'המחמצת מוזנת ב',
+  fl_bread: 'קמח לחם', fl_ww: 'קמח מלא', fl_rye: 'שיפון', fl_spelt: 'כוסמין',
+  lgBlend: 'תערובת קמחים', sBread: 'יתרת התערובת',
+  lgInc: 'תוספות (לא חובה)', lIncName: 'מה', phInc: 'זרעים, זיתים, גבינה…', lInc: 'כמות',
+  stDoughL: 'סך הבצק', stFlourL: 'סך הקמח', stLevL: 'מחמצת נדרשת', stPffL: 'קמח מותסס מראש',
+  sheetTitle: 'דף מתכון', sheetTitleN: 'דף מתכון · {n} × {w}',
+  sheetHint: 'שקלו לפי עמודת <b class="acc">להוספה לקערה</b>',
+  thIng: 'מרכיב', thPct: '% אופה', thTotal: 'סה״כ', thMix: 'להוספה לקערה',
+  water: 'מים', salt: 'מלח', inclusions: 'תוספות', levain: 'מחמצת', levHydSfx: '(הידרציה {h})', inTotals: 'כלול בסה״כ', flourInLev: 'קמח במחמצת', waterInLev: 'מים במחמצת', totalDough: 'סך הבצק',
+  nBlendOver: '<b>התערובת עוברת 100%.</b> קמח מלא, שיפון וכוסמין יחד הם יותר מכל הקמח. הורידו אחד מהם.',
+  nLevFlour: '<b>המחמצת צורכת יותר {f} ממה שיש במתכון.</b> הורידו את אחוז המחמצת, העלו את ה{f} בתערובת, או הזינו את המחמצת בקמח אחר.',
+  nLevWater: '<b>המחמצת מביאה יותר מים ממה שכל הבצק צריך.</b> העלו את ההידרציה או הורידו את אחוז המחמצת.',
+  nWet: '<b>רטוב מהרגיל לתערובת הזו.</b> צפו לבצק רפוי. שמרו בצד חלק מהמים והוסיפו אותם אחרי הקיפולים הראשונים אם הבצק מרגיש רך מדי.',
+  nDry: '<b>יבש מהרגיל לתערובת הזו.</b> מתאים לפירורית צפופה יותר או ללחם אחיד, אבל קמח מלא עלול להרגיש נוקשה.',
+  nSaltHi: '<b>מלח מעל 2.5%</b> ירגיש מלוח ויאט את התסיסה באופן ניכר.',
+  nSaltLo: '<b>מלח מתחת ל-1.6%</b> עלול לטעום תפל, והבצק יתסוס מהר יותר.',
+  nLevHi: '<b>הרבה מחמצת.</b> ההתפחה תהיה מהירה והטעם חמוץ יותר. מתאים למטבח קר.',
+  nLevLo: '<b>מעט מחמצת.</b> צפו להתפחה ארוכה. מתאים למטבח חם או להתפחה של לילה.',
+  nTip: '<b>טיפ:</b> שמרו בצד כ-{g} מהמים והוסיפו אותם יחד עם המלח. זה עוזר להמיס את המלח ומאפשר לכוונן אם הבצק מרגיש רטוב מדי.',
+  aTitle: 'בדיקת מתכון שמצאתם', aDesc: 'הזינו את הגרמים מכל מתכון כדי לראות את ההידרציה, המלח ואחוז המחמצת האמיתיים, ואז טענו אותו למחשבון כדי לשנות כמות.',
+  aFlourL: 'קמח', aWaterL: 'מים', aStarterL: 'מחמצת', aStarterHydL: 'הידרציית מחמצת', aSaltL: 'מלח',
+  aLoad: 'טעינה למחשבון', aNeedFlour: 'הזינו קודם את משקל הקמח.', aLoaded: 'נטען. עברו ל״לפי משקל בצק״ כדי לשנות כמות.',
+  rSaveTitle: 'שמירת המתכון', rSaveDesc: 'שמרו את המתכון הנוכחי עם שם והערות. תמצאו אותו אחר כך ב״המתכונים שלי״.',
+  rNameL: 'שם המתכון', rNamePh: 'לחם כפרי של שבת', rNotesL: 'הערות (לא חובה)', rNotesPh: 'התפחה 5 שעות ב-25°C, אוזן יפה…',
+  rSave: 'שמירת מתכון', rSaving: 'שומר…', rSaved: '״{n}״ נשמר.', rUpdated: '״{n}״ עודכן.', rNeedName: 'תנו למתכון שם קודם.',
+  rLede: 'מתכונים ששמרתם מלשונית המתכון. טענו מתכון כדי לאפות אותו שוב או לשנות אותו. שמירה עם אותו שם מעדכנת אותו.',
+  rEmpty: 'אין עדיין מתכונים שמורים. הגדירו מתכון, תנו לו שם ולחצו על ״שמירת מתכון״.',
+  rLoad: 'טעינה', rDelete: 'מחיקה', rConfirm: 'לאשר', rLoadedMsg: '״{n}״ נטען.', rDeleted: 'המתכון נמחק.',
+  rMeta: 'הידרציה {hyd} · מחמצת {lev} · {w} · נשמר {date}',
+  rCloud: 'נשמר בחשבון claude.ai שלכם. רק אתם רואים אותם.', rLocal: 'נשמר בדפדפן הזה בלבד. המתכונים נשארים במכשיר הזה.',
+  rLoading: 'מתחבר לחשבון…',
+  rError: 'השמירה נכשלה: {m}', rQuota: 'האחסון מלא. מחקו מתכון ישן ונסו שוב.', rDelError: 'המחיקה נכשלה. נסו שוב.',
+  lvLede: 'הכינו רק את כמות המחמצת שצריך. יחס הזנה גבוה לוקח יותר זמן להגיע לשיא ונותן טעם עדין; יחס נמוך מהיר וחמצמץ יותר. הזמנים מניחים מחמצת בריאה שמכפילה את עצמה תוך 4–6 שעות מהזנה של 1:1:1.',
+  lgHowMuch: 'כמה', lLevNeed: 'למתכון', sLevNeed: 'מלשונית המתכון', lLevKeep: 'תוספת', sLevKeep: 'לשמירת מחמצת האם, ומה שנשאר בצנצנת',
+  lgRatio: 'יחס הזנה (מחמצת : קמח : מים)', lgCond: 'תנאים', lLevTemp: 'טמפ׳ התסיסה', lLevFeedAt: 'שעת הזנה',
+  buildTitle: 'להכנה', buildHyd: 'הידרציה ≈ {h}% (עם מחמצת אם של 100%)', buildHydExp: ' · המתכון מצפה ל-{h}%',
+  pSL: 'מחמצת בשלה', pFL: 'קמח', pWL: 'מים', peakL: 'שיא צפוי',
+  peakNote: 'כ-{d} אחרי ההזנה{nd}. בדקו החל מ-{t}.', nextDay: ' (למחרת)',
+  ratiosAt: 'יחסים ב-{t}', ratiosDesc: 'בחרו יחס שמגיע לשיא כשאתם מתכננים ללוש. הקישו על שורה כדי לבחור.',
+  thRatio: 'יחס', thStarter: 'מחמצת', thPeak: 'שיא בעוד',
+  readyT: 'סימנים שהמחמצת מוכנה',
+  readyList: ['גדלה בערך פי 2 (או פי 3) מאז ההזנה, עם חלק עליון מקומר או שמתחיל להשתטח.', 'בועות לאורך כל הצנצנת, לא רק למעלה.', 'ריח חמצמץ ונעים של שמרים, כמו יוגורט או בירה. ריח חריף של אצטון אומר שהשיא עבר מזמן.', 'מבחן הציפה עובד רק במחמצת סמיכה מקמח חיטה. מחמצת שיפון או מחמצת רטובה יכולות לשקוע גם כשהן מוכנות.'],
+  wLede: 'טמפרטורת הבצק היא הגורם המשפיע ביותר על מהירות התסיסה. בחרו טמפרטורת בצק רצויה, מדדו את המרכיבים, והמחשבון יגיד לכם באיזו טמפרטורה צריכים להיות המים.',
+  lgTarget: 'יעד', lDdt: 'טמפ׳ בצק רצויה', sDdt: 'בדרך כלל 24–26°C (76–78°F)', lgMeasured: 'טמפרטורות שנמדדו', lRoom: 'חדר', lMix: 'לישה',
+  friction: { '1.5': 'ביד', '0': 'בלי לישה / קיפולים בלבד', '13': 'מיקסר', '15': 'מיקסר ספירלי' }, frFmt: '{l} (חיכוך {d})',
+  waterL: 'טמפרטורת מי הלישה',
+  wFormula: 'נוסחה: מים = (יעד × 4) − חדר − קמח − מחמצת − מקדם חיכוך. מקדם החיכוך מייצג את החום שנוצר בלישה.',
+  wHot: '<b>חם מדי.</b> מים מעל כ-{t} עלולים לפגוע במחמצת. הגבילו לטמפרטורה הזו ושמרו את הבצק במקום חם (תנור כבוי עם נורה דולקת עובד טוב) כדי להשלים את הפער.',
+  wCold: '<b>קר יותר ממי ברז.</b> השתמשו במי קרח ובקמח מקורר, או קבלו בצק חם יותר וקצרו את ההתפחה.',
+  wCool: '<b>צריך מים קרים.</b> הוסיפו כמה קוביות קרח וערבבו לפני השקילה.',
+  wEasy: '<b>קל להגיע.</b> ערבבו מים חמים וקרים מהברז ובדקו עם מדחום.',
+  wCheck: 'מדדו את טמפרטורת הבצק מיד אחרי הלישה. כל מעלה צלזיוס מעל או מתחת ליעד משנה את זמן ההתפחה בכ-8%.',
+  sLede: 'ציר זמן שמבוסס על טמפרטורת הבצק, אחוז המחמצת ותערובת הקמחים. זמני ההתפחה הם הערכה. הסתכלו על הבצק והשתמשו בתפיחת היעד כסימן האמיתי.',
+  lgPlan: 'תכנון לפי', anchorStart: 'התחלת לישה ב', anchorReady: 'לחם מוכן עד',
+  lgFerm: 'תסיסה', lSchTemp: 'טמפ׳ בצק', lSchBulk: 'זמן התפחה', bulkEst: 'הערכה: {d}', phAuto: 'אוטו׳',
+  lAutolyse: 'אוטוליזה', aNone: 'בלי', a30: '30 דק׳', a60: 'שעה', a120: 'שעתיים', lFolds: 'סבבי קיפולים', lFoldGap: 'כל',
+  lgProof: 'התפחה ואפייה', lRetard: 'התפחה במקרר', sRetard: 'טעם עשיר יותר וחריצה קלה', lCool: 'קירור לפני חיתוך',
+  tlTitle: 'ציר זמן', tlSummary: '{d} מההזנה ועד החיתוך', pickDate: 'בחרו תאריך ושעה.',
+  dayToday: 'היום', dayTomorrow: 'מחר', dayYesterday: 'אתמול',
+  sFeed: 'הזנת המחמצת ({r})', sFeedD: 'סה״כ {g}. שמרו בסביבות {t}. אמורה להגיע לשיא בעוד כ-{d}.',
+  sAuto: 'ערבוב קמח ומים (אוטוליזה)', sAutoD: '{f} קמח עם {w} מים. כסו והניחו לנוח.',
+  sAddLev: 'הוספת מחמצת ואז מלח', sAddLevD: '{l} מחמצת, ואחריה {s} מלח עם המים ששמרתם בצד. צבטו וקפלו עד שהכול מתאחד. כוונו לבצק בטמפ׳ {t}.',
+  sMixAll: 'ערבוב כל המרכיבים', sMixAllD: 'מחמצת, מים, קמח ואז מלח. כוונו לבצק בטמפ׳ {t}.',
+  sFold: 'מתיחה וקיפול, סבב {i} מתוך {n}', sFoldInc: 'זה הזמן לשלב את ה{x}.', sFoldLast: 'מעכשיו השאירו את הבצק מכוסה ובשקט.',
+  sBulkEnd: 'סוף ההתפחה, עיצוב מקדים', risePill: 'תפיחה ~{p}%', sBulkEndD: 'התפחה ≈ {d} ב-{t}. תסתמכו על הבצק: מקומר, רוטט, בועות בדפנות. עצבו לכדור והניחו 20–30 דק׳ בלי כיסוי.',
+  sShape: 'עיצוב סופי', sShapeD: 'עצבו במתח, והניחו בבנטון מקומח עם התפר כלפי מעלה.',
+  sFridge: 'למקרר', sFridgeD: 'כסו והתפיחו במקרר כ-{h} שעות ב-3–5°C.',
+  sRoomProof: 'התפחה בטמפ׳ החדר', sRoomProofD: 'כ-{d}. השתמשו במבחן הלחיצה.',
+  sPreheat: 'חימום התנור עם סיר הברזל בפנים', sPreheatD: '{t} במשך שעה שלמה כדי שהסיר יתחמם היטב.',
+  sBake: 'חריצה ואפייה עם מכסה', sBakeD: 'ישר מהמקרר על נייר אפייה. חרצו בעומק כ-1 ס״מ בזווית נמוכה. 20 דק׳ עם מכסה ב-{t}.',
+  sLidOff: 'הסרת המכסה', sLidOffD: 'הורידו ל-{t}. אפו עוד 20–25 דק׳ עד שחום עמוק. בפנים צריך להיות {a}–{b}.',
+  sOut: 'הוצאה מהתנור לרשת', sOutD: 'הפירורית עדיין מתייצבת. תנו לו להתקרר.', sSlice: 'חיתוך',
+  fixLede: 'רוב הבעיות בלחם מחמצת נובעות מתסיסה (מעט מדי או יותר מדי), מחוזק הגלוטן או מהחום. פתחו בעיה כדי לראות מה בדרך כלל גורם לה ומה לשנות באפייה הבאה. שנו דבר אחד בכל פעם.',
+  causesH: 'סיבות אפשריות', fixH: 'נסו בפעם הבאה',
+  cats: { All: 'הכול', Crumb: 'פירורית', Shape: 'צורה', Crust: 'קרום', Flavor: 'טעם', Dough: 'בצק', Starter: 'מחמצת' },
+  gProcT: 'התהליך מההתחלה ועד הסוף', hydT: 'הידרציה לפי סוג קמח', thTyp: 'הידרציה טיפוסית', thWhy: 'למה',
+  hydRows: [['קמח לבן רגיל', '65–70%', 'פחות חלבון, הבצק נהיה רפוי מהר'], ['קמח לחם', '70–78%', 'גלוטן חזק, נקודת פתיחה קלה'], ['+20% קמח מלא', '75–82%', 'הסובין סופג יותר מים'], ['50%+ קמח מלא', '80–88%', 'צריך יותר מים והשריה ארוכה'], ['הרבה שיפון (40%+)', '80–90%', 'הפנטוזנים מחזיקים מים; בצק דביק'], ['כוסמין', '65–72%', 'גלוטן חלש ונמתח']],
+  hydTip: 'מתחילים עם מחמצת? התחילו ב-68–72% עם קמח לחם. בצק רטוב קשה יותר לעיצוב, וכיכר של 70% שתססה טוב עדיפה על כיכר של 85% שלא טופלה נכון.',
+  bulkT: 'איך יודעים שההתפחה הסתיימה',
+  bulkList: ['הנפח גדל לפי תפיחת היעד שבלוח הזמנים. קופסה עם דפנות ישרות וגומייה לסימון מקלות על המדידה.', 'חלק עליון מקומר ותפוח מעט, שמשתחרר בקלות מדפנות הקופסה.', 'בועות על פני הבצק ולאורך הדפנות; הבצק רוטט כשמנערים את הקופסה.', 'הבצק מרגיש אוורירי וקל יותר, כבר לא צפוף ומתוח.'],
+  bulkTip: 'צנצנת מדידה עוזרת: שימו חתיכת בצק קטנה בכוסית מיד אחרי הלישה ועקבו אחרי התפיחה שלה.',
+  pokeT: 'מבחן הלחיצה (התפחה סופית)',
+  pokeList: ['<b>חוזר מהר:</b> לא התפיח מספיק. תנו עוד זמן.', '<b>חוזר לאט ומשאיר גומה קטנה:</b> מוכן לאפייה.', '<b>לא חוזר:</b> התפיח יותר מדי. אפו מיד, אולי בתבנית.'],
+  pokeTip: 'בצק קר ישר מהמקרר חוזר לאט יותר, אז קראו את המבחן בגמישות אחרי התפחה במקרר.',
+  footer: 'זמני התסיסה הם הערכות לפי כללי אצבע מקובלים באפייה ביתית: כ-8% מהר יותר לכל מעלה צלזיוס נוספת, ומהר יותר עם יותר מחמצת וקמח מלא. כל מחמצת שונה, אז רשמו את התוצאות שלכם וכווננו.',
+  process: [
+    ['הזנת המחמצת', 'הכינו מחמצת טרייה ממחמצת האם כך שתגיע לשיא בזמן הלישה. ראו את לשונית הכנת המחמצת.'],
+    ['אוטוליזה (לא חובה)', 'ערבבו את הקמח ורוב המים והניחו ל-30–60 דק׳. הגלוטן מתחיל להיווצר לבד והבצק נעשה קל יותר לעבודה.'],
+    ['לישה', 'הוסיפו מחמצת בשלה, ואז מלח עם המים ששמרתם בצד. צבטו וקפלו עד שהכול מתאחד. מדדו את טמפרטורת הבצק.'],
+    ['התפחה ראשונה עם קיפולים', 'עשו 3–4 סבבים של מתיחות וקיפולים או קיפולי סליל כל 30 דק׳, ואז השאירו את הבצק. ההתפחה נגמרת לפי הנפח והתחושה, לא לפי השעון.'],
+    ['עיצוב מקדים ומנוחה', 'הוציאו את הבצק, עגלו אותו בעדינות, והניחו ל-20–30 דק׳ עד שהוא נרגע ומתפשט מעט.'],
+    ['עיצוב סופי', 'צרו מתח על פני הבצק לכיכר עגולה או מאורכת, והניחו בבנטון מקומח עם התפר כלפי מעלה. קמח אורז מונע הידבקות.'],
+    ['התפחה סופית', 'התפחה במקרר 8–48 שעות לטעם עשיר וחריצה קלה, או 1–3 שעות בטמפ׳ החדר.'],
+    ['אפייה', 'חממו סיר ברזל ב-{hot} במשך שעה. חרצו, אפו 20 דק׳ עם מכסה ואז 20–25 דק׳ בלי מכסה ב-{mid} עד שחום עמוק.'],
+    ['קירור', 'חכו לפחות 1–2 שעות. הלחם עדיין מתבשל מבפנים, וחיתוך מוקדם הופך את הפירורית לדביקה.'],
+  ],
+  issues: [
+    ['Crumb', 'פירורית צפופה, הדוקה ודביקה', ['תסיסה חסרה: ההתפחה הסתיימה מוקדם מדי או שהבצק היה קר מדי', 'מחמצת חלשה או איטית', 'חיתוך כשהלחם עוד חם'], ['האריכו את ההתפחה עד שתראו את תפיחת היעד ובצק מקומר ורוטט', 'העלו את טמפ׳ הבצק ל-24–26°C', 'הזינו את המחמצת פעמיים ביום כמה ימים לפני האפייה', 'קררו לפחות 1–2 שעות לפני חיתוך']],
+    ['Crumb', 'חורים גדולים מתחת לקרום וצפוף למטה', ['התפחה חסרה, מה שנקרא ״פירורית שוטים״', 'לא נבנה מספיק חוזק בקיפולים', 'יותר מדי קמח נכלא בזמן העיצוב'], ['התפחה ארוכה יותר או בצק חם מעט יותר', 'הוסיפו סבב או שניים של קיפולים', 'עצבו עם כמה שפחות קמח פיזור']],
+    ['Crumb', 'מנהרות לא אחידות', ['כיסי אוויר שנכלאו בעיצוב', 'כיסים של קמח יבש מלישה חלקית'], ['הוציאו אוויר בעדינות בעיצוב המקדים', 'לושו עד שלא נשארים גושים יבשים לפני ההתפחה']],
+    ['Shape', 'כיכר שטוחה שמתפשטת', ['תסיסת יתר: ההתפחה הייתה ארוכה או חמה מדי', 'יותר מדי מים לקמח', 'עיצוב חלש, חסר מתח על פני הבצק'], ['קצרו את ההתפחה או עצרו בתפיחה קטנה יותר', 'הורידו הידרציה ב-3–5%', 'התפיחו במקרר כדי שהבצק ישמור על צורה', 'תרגלו עיצוב סופי הדוק יותר']],
+    ['Shape', 'אין תפיחה בתנור ואין אוזן', ['התפחת יתר', 'חריצה רדודה מדי או זקופה מדי', 'התנור או הסיר לא חמים מספיק', 'אין מספיק אדים'], ['עשו מבחן לחיצה ואפו מוקדם יותר', 'חרצו בעומק כ-1 ס״מ בזווית 30–45° בתנועה אחת בטוחה', 'חממו את הסיר שעה שלמה', 'השאירו את המכסה ב-20 הדקות הראשונות']],
+    ['Shape', 'הכיכר נפרצת בצד', ['התפחה חסרה', 'חריצה רדודה, אז הכיכר מצאה נקודת תורפה משלה'], ['תנו קצת יותר התפחה', 'חרצו עמוק וארוך יותר']],
+    ['Crust', 'קרום חיוור', ['תסיסת יתר: השמרים והחיידקים אכלו את הסוכרים', 'תנור קר מדי או אפייה קצרה', 'המכסה נשאר יותר מדי זמן'], ['קצרו את התסיסה', 'אפו יותר זמן בלי מכסה עד שחום עמוק', 'בדקו את התנור עם מדחום תנור']],
+    ['Crust', 'תחתית שרופה', ['הסיר קרוב מדי לגוף החימום התחתון', 'סיר כהה סופג יותר מדי חום'], ['הזיזו את הרשת קומה אחת למעלה', 'שימו תבנית על הרשת שמתחת', 'פזרו מעט סולת או שימו נייר אפייה נוסף מתחת לכיכר']],
+    ['Crust', 'קרום עבה וקשה', ['אפייה ארוכה מדי בלי מכסה', 'בצק עם הידרציה נמוכה'], ['הוציאו את הכיכר כשהפנים מגיע ל-96–98°C', 'העלו מעט את ההידרציה']],
+    ['Flavor', 'חמוץ מדי', ['תסיסה ארוכה וחמה', 'מחמצת שהשתמשו בה אחרי השיא', 'הרבה קמח מלא או שיפון במחמצת'], ['השתמשו במחמצת בדיוק בשיא, לא אחריו', 'השתמשו ביחס הזנה גבוה יותר כמו 1:5:5', 'התפחה קצרה יותר במקרר']],
+    ['Flavor', 'לא חמוץ מספיק', ['מחמצת צעירה', 'תסיסה קצרה בטמפרטורה חמה'], ['השתמשו במחמצת סמיכה (הידרציה 50–60%)', 'הזינו את המחמצת עם מעט שיפון או קמח מלא', 'האריכו את ההתפחה במקרר ל-24–48 שעות']],
+    ['Dough', 'בצק דביק ונוזלי שלא מחזיק צורה', ['הידרציה גבוהה מדי לקמח', 'תסיסת יתר: הגלוטן מתפרק', 'לא נבנה מספיק חוזק'], ['בפעם הבאה שמרו בצד 5–10% מהמים', 'השתמשו בקמח לחם חזק יותר', 'עשו קיפולי סליל או כמה דקות של ״סלאפ אנד פולד״', 'עבדו עם ידיים רטובות, לא מקומחות, בזמן הקיפולים']],
+    ['Dough', 'הבצק נקרע בקיפולים', ['נוקשה מדי או עבודה רבה מדי בהתחלה', 'אין מספיק מנוחה בין הקיפולים'], ['אוטוליזה של 30–60 דק׳ לפני הוספת המחמצת', 'חכו יותר בין הסבבים כדי שהגלוטן יירגע']],
+    ['Starter', 'המחמצת לא תופחת', ['קר מדי', 'מוזנת לעתים קרובות מדי ביחס לחוזק שלה', 'מים עם כלור או קמח מולבן'], ['שמרו אותה ב-24–27°C', 'הוסיפו 10–20% שיפון מלא או קמח מלא להזנה', 'השתמשו במים מסוננים או במי ברז שעמדו', 'הזינו 1:1:1 ותנו לה שבוע של הזנות קבועות']],
+    ['Starter', 'שכבת נוזל למעלה', ['מחמצת רעבה, אחרי השיא'], ['שפכו את הנוזל (טעם עדין) או ערבבו אותו פנימה (חמוץ יותר) והזינו', 'הזינו לעתים קרובות יותר או ביחס גבוה יותר']],
+  ],
+},
+};
+
+/* ================= helpers ================= */
+const $ = id => document.getElementById(id);
+const num = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const STORE = 'levain-ledger-v1';
+const RECIPES_LOCAL = 'levain-ledger-recipes';
+let unit = 'C', lang = 'en';
+const t = (k, v) => {
+  let s = STR[lang][k] !== undefined ? STR[lang][k] : STR.en[k];
+  if (s === undefined) return k;
+  if (v && typeof s === 'string') s = s.replace(/\{(\w+)\}/g, (_, x) => v[x] !== undefined ? v[x] : '');
+  return s;
+};
+const loc = () => lang === 'he' ? 'he-IL' : undefined;
+const toC = v => unit === 'C' ? v : (v - 32) * 5 / 9;
+const fromC = c => unit === 'C' ? c : c * 9 / 5 + 32;
+const fmtT = c => Math.round(fromC(c)) + '°' + unit;
+const grams = x => (Math.abs(x) < 100 ? (Math.round(x * 10) / 10).toFixed(1) : Math.round(x).toLocaleString('en-US')) + ' ' + t('g');
+const pct = x => (Math.round(x * 10) / 10).toString().replace(/\.0$/, '') + '%';
+const FKEYS = ['bread', 'ww', 'rye', 'spelt'];
+const fname = k => t('fl_' + k);
+const FCOLOR = { bread: 'var(--bread)', ww: 'var(--ww)', rye: 'var(--rye)', spelt: 'var(--spelt)' };
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function fmtDur(h){
+  const m = Math.round(h * 60); const hh = Math.floor(m / 60), mm = m % 60;
+  return mm ? `${hh} ${t('h')} ${mm} ${t('min')}` : `${hh} ${t('h')}`;
+}
+let F = {};
+
+/* ================= presets ================= */
+const PRESETS = [
+  { hyd: 75, salt: 2, lev: 20, levHyd: 100, ww: 10, rye: 0, spelt: 0, inc: 0, incName: '' },
+  { hyd: 70, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 0, spelt: 0, inc: 0, incName: '' },
+  { hyd: 80, salt: 2.1, lev: 15, levHyd: 100, ww: 5, rye: 5, spelt: 0, inc: 0, incName: '' },
+  { hyd: 84, salt: 2, lev: 20, levHyd: 100, ww: 50, rye: 0, spelt: 0, inc: 0, incName: '' },
+  { hyd: 80, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 25, spelt: 0, inc: 0, incName: '' },
+  { hyd: 78, salt: 2.2, lev: 20, levHyd: 100, ww: 15, rye: 0, spelt: 0, inc: 15, incName: '@seed' },
+];
+let presetOn = -1;
+function renderPresets(){
+  $('presets').innerHTML = t('presets').map((n, i) => `<button type="button" class="chip" data-i="${i}" aria-pressed="${i === presetOn}">${escapeHtml(n)}</button>`).join('');
+}
+$('presets').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const i = +b.dataset.i;
+  Object.entries(PRESETS[i]).forEach(([k, v]) => { $(k).value = v === '@seed' ? t('seedMix') : v; });
+  markPreset(i); recalc(); save();
+});
+function markPreset(i){ presetOn = i; $('presets').querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(+c.dataset.i === i))); }
+
+/* ================= formula ================= */
+function calcFormula(){
+  const mode = $('modeFlour').checked ? 'flour' : 'dough';
+  $('doughModeFields').hidden = mode !== 'dough';
+  $('flourModeFields').hidden = mode !== 'flour';
+  const h = num('hyd') / 100, s = num('salt') / 100, l = num('lev') / 100, lh = num('levHyd') / 100, inc = num('inc') / 100;
+  const share = { ww: num('ww') / 100, rye: num('rye') / 100, spelt: num('spelt') / 100 };
+  share.bread = 1 - share.ww - share.rye - share.spelt;
+  $('breadPct').value = Math.round(share.bread * 1000) / 10;
+  const doughTarget = num('loaves') * num('loafWeight');
+  const flour = mode === 'dough' ? doughTarget / (1 + h + s + inc) : num('flourTotal');
+  const L = flour * l, Lf = L / (1 + lh), Lw = L - Lf;
+  const W = flour * h, S = flour * s, I = flour * inc;
+  const levFlour = $('levFlour').value;
+  const flours = FKEYS.map(k => {
+    const total = flour * Math.max(share[k], 0);
+    return { k, total, mix: total - (k === levFlour ? Lf : 0), pct: share[k] * 100 };
+  });
+  F = { mode, flour, h, s, l, lh, L, Lf, Lw, W, S, I, inc, share, flours, levFlour, mixWater: W - Lw,
+        total: flour + W + S + I, wholeFrac: clamp(share.ww + share.rye + share.spelt * 0.5, 0, 1) };
+}
+function incLabel(){ return $('incName').value.trim() || t('inclusions'); }
+function renderFormula(){
+  const r = F;
+  $('stDough').textContent = grams(r.total);
+  $('stFlour').textContent = grams(r.flour);
+  $('stLev').textContent = grams(r.L);
+  $('stPff').textContent = pct(r.flour ? r.Lf / r.flour * 100 : 0);
+  const loaves = num('loaves');
+  $('sheetTitle').textContent = r.mode === 'dough' && loaves > 0 ? t('sheetTitleN', { n: loaves, w: grams(num('loafWeight')) }) : t('sheetTitle');
+
+  let rows = '';
+  r.flours.filter(f => f.pct > 0 || (f.k === r.levFlour && r.Lf > 0)).forEach(f => {
+    rows += `<tr><td><span class="sw" style="background:${FCOLOR[f.k]}"></span>${fname(f.k)}</td><td class="n">${pct(f.pct)}</td><td class="n">${grams(f.total)}</td><td class="n mix">${grams(Math.max(f.mix, 0))}</td></tr>`;
+  });
+  rows += `<tr><td><span class="sw" style="background:var(--water)"></span>${t('water')}</td><td class="n">${pct(r.h * 100)}</td><td class="n">${grams(r.W)}</td><td class="n mix">${grams(Math.max(r.mixWater, 0))}</td></tr>`;
+  rows += `<tr><td><span class="sw" style="background:var(--salt)"></span>${t('salt')}</td><td class="n">${pct(r.s * 100)}</td><td class="n">${grams(r.S)}</td><td class="n mix">${grams(r.S)}</td></tr>`;
+  if (r.I > 0) rows += `<tr><td><span class="sw" style="background:var(--seed)"></span>${escapeHtml(incLabel())}</td><td class="n">${pct(r.inc * 100)}</td><td class="n">${grams(r.I)}</td><td class="n mix">${grams(r.I)}</td></tr>`;
+  rows += `<tr><td><span class="sw" style="background:transparent;border:2px solid var(--accent)"></span>${t('levain')} <span class="muted small">${t('levHydSfx', { h: pct(r.lh * 100) })}</span></td><td class="n">${pct(r.l * 100)}</td><td class="n muted">${t('inTotals')}</td><td class="n mix">${grams(r.L)}</td></tr>`;
+  rows += `<tr class="sub"><td>${t('flourInLev')}</td><td class="n"></td><td class="n">${grams(r.Lf)}</td><td class="n"></td></tr>`;
+  rows += `<tr class="sub"><td>${t('waterInLev')}</td><td class="n"></td><td class="n">${grams(r.Lw)}</td><td class="n"></td></tr>`;
+  const bakersTotal = 100 + r.h * 100 + r.s * 100 + r.inc * 100;
+  rows += `<tr class="total"><td>${t('totalDough')}</td><td class="n">${pct(bakersTotal)}</td><td class="n">${grams(r.total)}</td><td class="n">${grams(r.total)}</td></tr>`;
+  $('sheet').innerHTML = rows;
+
+  const segs = [];
+  r.flours.forEach(f => { if (f.total > 0) segs.push([fname(f.k), f.total, FCOLOR[f.k]]); });
+  segs.push([t('water'), r.W, 'var(--water)'], [t('salt'), r.S, 'var(--salt)']);
+  if (r.I > 0) segs.push([incLabel(), r.I, 'var(--seed)']);
+  const tot = segs.reduce((a, s) => a + s[1], 0) || 1;
+  $('bar').innerHTML = segs.map(s => `<div title="${escapeHtml(s[0])}" style="width:${s[1] / tot * 100}%;background:${s[2]}"></div>`).join('');
+  $('legend').innerHTML = segs.map(s => `<span><span class="sw" style="background:${s[2]}"></span>${escapeHtml(s[0])} ${Math.round(s[1] / tot * 100)}%</span>`).join('');
+
+  const notes = [];
+  const lo = Math.round(68 + 12 * r.share.ww + 18 * r.share.rye - 4 * Math.max(r.share.spelt, 0));
+  const hi = lo + 8;
+  $('hydHint').textContent = t('hydHint', { lo, hi });
+  const lfName = lang === 'en' ? fname(r.levFlour).toLowerCase() : fname(r.levFlour);
+  if (r.share.bread < -0.0001) notes.push(['bad', t('nBlendOver')]);
+  const lf = r.flours.find(f => f.k === r.levFlour);
+  if (lf && lf.mix < -0.5) notes.push(['bad', t('nLevFlour', { f: lfName })]);
+  if (r.mixWater < 0) notes.push(['bad', t('nLevWater')]);
+  if (r.h * 100 > hi + 2) notes.push(['warn', t('nWet')]);
+  if (r.h * 100 < lo - 4) notes.push(['warn', t('nDry')]);
+  if (r.s * 100 > 2.5) notes.push(['warn', t('nSaltHi')]);
+  if (r.s > 0 && r.s * 100 < 1.6) notes.push(['warn', t('nSaltLo')]);
+  if (r.l * 100 > 30) notes.push(['warn', t('nLevHi')]);
+  if (r.l * 100 < 10) notes.push(['warn', t('nLevLo')]);
+  if (r.mixWater > 0) notes.push(['', t('nTip', { g: grams(r.mixWater * 0.06) })]);
+  $('notes').innerHTML = notes.map(n => `<div class="note ${n[0]}">${n[1]}</div>`).join('');
+}
+
+/* recipe checker */
+function renderAnalyze(){
+  const fl = num('aFlour'), wa = num('aWater'), st = num('aStarter'), sh = num('aStarterHyd') / 100, sa = num('aSalt');
+  const sf = st / (1 + sh), sw = st - sf, tf = fl + sf;
+  $('aHyd').textContent = tf ? pct((wa + sw) / tf * 100) : '–';
+  $('aSaltPct').textContent = tf ? pct(sa / tf * 100) : '–';
+  $('aLevPct').textContent = tf ? pct(st / tf * 100) : '–';
+  return { tf, hyd: tf ? (wa + sw) / tf * 100 : 0, salt: tf ? sa / tf * 100 : 0, lev: tf ? st / tf * 100 : 0, sh: sh * 100 };
+}
+$('aLoad').addEventListener('click', () => {
+  const a = renderAnalyze();
+  if (!a.tf) { $('aMsg').textContent = t('aNeedFlour'); return; }
+  $('modeFlour').checked = true;
+  $('flourTotal').value = Math.round(a.tf);
+  $('hyd').value = Math.round(a.hyd * 10) / 10;
+  $('salt').value = Math.round(a.salt * 10) / 10;
+  $('lev').value = Math.round(a.lev * 10) / 10;
+  $('levHyd').value = Math.round(a.sh);
+  markPreset(-1); recalc(); save();
+  $('aMsg').textContent = t('aLoaded');
+});
+
+/* ================= saved recipes ================= */
+const RECIPE_FIELDS = ['loaves', 'loafWeight', 'flourTotal', 'hyd', 'salt', 'lev', 'levHyd', 'levFlour', 'ww', 'rye', 'spelt', 'incName', 'inc'];
+let store = { kind: 'pending' }; // pending | cloud | local
+let recipes = [];
+function readLocalRecipes(){ try { return JSON.parse(localStorage.getItem(RECIPES_LOCAL) || '[]'); } catch (e) { return []; } }
+function writeLocalRecipes(){ try { localStorage.setItem(RECIPES_LOCAL, JSON.stringify(recipes)); return true; } catch (e) { return false; } }
+function useLocal(){ store = { kind: 'local' }; recipes = readLocalRecipes(); renderRecipes(); }
+async function initRecipes(){
+  renderRecipes();
+  let db = null, user = null;
+  try {
+    if (window.claude && typeof window.claude.use === 'function') {
+      [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    }
+  } catch (e) {}
+  const uid = user ? await user.id() : null;
+  if (!db || !uid) { useLocal(); return; }
+  try {
+    const col = db.collection('data/users/' + uid);
+    store = { kind: 'cloud', col };
+    renderRecipes();
+    col.onSnapshot(snap => {
+      recipes = snap.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).filter(r => r.kind === 'recipe');
+      renderRecipes();
+    }, () => { useLocal(); });
+  } catch (e) { useLocal(); }
+}
+function setStatus(msg, cls){ const s = $('rStatus'); s.textContent = msg; s.className = 'status ' + (cls || ''); }
+$('rSave').addEventListener('click', async () => {
+  const name = $('rName').value.trim();
+  if (!name) { setStatus(t('rNeedName'), 'err'); $('rName').focus(); return; }
+  const values = {}; RECIPE_FIELDS.forEach(id => values[id] = $(id).value);
+  values.mode = $('modeFlour').checked ? 'flour' : 'dough';
+  const existing = recipes.find(r => (r.name || '').trim().toLowerCase() === name.toLowerCase());
+  const id = existing ? existing.id : 'r-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const body = { kind: 'recipe', name, notes: $('rNotes').value.trim(), values, total: Math.round(F.total), savedAt: Date.now() };
+  const btn = $('rSave'); btn.disabled = true; btn.textContent = t('rSaving');
+  try {
+    if (store.kind === 'cloud') {
+      await store.col.doc(id).set(body);
+    } else {
+      if (store.kind === 'pending') useLocal();
+      recipes = recipes.filter(r => r.id !== id).concat([Object.assign({ id }, body)]);
+      if (!writeLocalRecipes()) throw { code: 'local' };
+      renderRecipes();
+    }
+    setStatus(t(existing ? 'rUpdated' : 'rSaved', { n: name }), 'ok');
+  } catch (e) {
+    setStatus(e && e.code === 'quota_exceeded' ? t('rQuota') : t('rError', { m: (e && e.message) || (e && e.code) || '?' }), 'err');
+  } finally { btn.disabled = false; btn.textContent = t('rSave'); }
+});
+function renderStoreNotes(){
+  ['storeNote', 'storeNote2'].forEach(id => {
+    const el = $(id);
+    el.className = 'store-note' + (store.kind === 'cloud' ? ' cloud' : '');
+    el.querySelector('span').textContent = store.kind === 'pending' ? t('rLoading') : store.kind === 'cloud' ? t('rCloud') : t('rLocal');
+  });
+}
+function renderRecipes(){
+  renderStoreNotes();
+  const list = $('recipeList');
+  const sorted = recipes.slice().sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+  if (!sorted.length) { list.innerHTML = `<p class="muted" style="padding:12px 0">${t(store.kind === 'pending' ? 'rLoading' : 'rEmpty')}</p>`; return; }
+  list.innerHTML = sorted.map(r => {
+    const v = r.values || {};
+    const date = r.savedAt ? new Date(r.savedAt).toLocaleDateString(loc(), { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+    const meta = t('rMeta', { hyd: `<bdi>${escapeHtml(v.hyd)}%</bdi>`, lev: `<bdi>${escapeHtml(v.lev)}%</bdi>`, w: `<bdi>${r.total ? grams(r.total) : ''}</bdi>`, date: escapeHtml(date) });
+    return `<div class="recipe" data-id="${escapeHtml(r.id)}">
+      <div><div class="nm">${escapeHtml(r.name)}</div><div class="meta">${meta}</div></div>
+      <div class="acts"><button type="button" class="btn small" data-act="load">${t('rLoad')}</button><button type="button" class="btn small ghost" data-act="del">${t('rDelete')}</button></div>
+      ${r.notes ? `<div class="notes-txt">${escapeHtml(r.notes)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+$('recipeList').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const id = b.closest('.recipe').dataset.id;
+  const r = recipes.find(x => x.id === id); if (!r) return;
+  if (b.dataset.act === 'load') {
+    const v = r.values || {};
+    RECIPE_FIELDS.forEach(k => { if (v[k] !== undefined) $(k).value = v[k]; });
+    $(v.mode === 'flour' ? 'modeFlour' : 'modeDough').checked = true;
+    $('rName').value = r.name || ''; $('rNotes').value = r.notes || '';
+    markPreset(-1); recalc(); save();
+    showTab('formula');
+    setStatus(t('rLoadedMsg', { n: r.name }), 'ok');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  if (b.dataset.armed !== '1') {
+    b.dataset.armed = '1'; b.textContent = t('rConfirm'); b.classList.remove('ghost'); b.classList.add('danger');
+    setTimeout(() => { if (b.isConnected) { b.dataset.armed = ''; b.textContent = t('rDelete'); b.classList.add('ghost'); b.classList.remove('danger'); } }, 4000);
+    return;
+  }
+  try {
+    if (store.kind === 'cloud') await store.col.doc(id).delete();
+    else { recipes = recipes.filter(x => x.id !== id); writeLocalRecipes(); renderRecipes(); }
+  } catch (err) { b.textContent = t('rDelError'); }
+});
+
+/* ================= levain ================= */
+function peakHours(a, b, c, tC){
+  const feed = (b + c) / Math.max(a, 0.01);
+  return clamp(2.8 * Math.sqrt(feed) * Math.pow(0.92, tC - 24), 1.5, 30);
+}
+function renderLevain(){
+  $('levNeed').value = Math.round(F.L);
+  const total = F.L + num('levKeep');
+  const a = num('rS'), b = num('rF'), c = num('rW');
+  const p = total / (a + b + c || 1);
+  $('levTotal').textContent = grams(total);
+  $('pS').textContent = grams(a * p); $('pF').textContent = grams(b * p); $('pW').textContent = grams(c * p);
+  const bh = (c + a / 2) / (b + a / 2) * 100;
+  let hn = t('buildHyd', { h: Math.round(bh) });
+  if (Math.abs(bh - F.lh * 100) > 15) hn += t('buildHydExp', { h: Math.round(F.lh * 100) });
+  $('levHydNote').textContent = hn;
+  const tC = toC(num('levTemp'));
+  const hrs = peakHours(a, b, c, tC);
+  const [fh, fm] = ($('levFeedAt').value || '21:00').split(':').map(Number);
+  const startMin = fh * 60 + fm, endMin = startMin + hrs * 60;
+  const hm = d => { const m = ((Math.round(d) % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+  $('levReady').textContent = hm(endMin);
+  $('levReadyNote').textContent = t('peakNote', { d: fmtDur(hrs), nd: endMin >= 1440 ? t('nextDay') : '', t: hm(endMin - 60) });
+  $('ratioTitle').textContent = t('ratiosAt', { t: fmtT(tC) });
+  const ratios = [[1, 1, 1], [1, 2, 2], [1, 3, 3], [1, 5, 5], [1, 10, 10]];
+  $('ratioTable').innerHTML = ratios.map(r => {
+    const q = total / (r[0] + r[1] + r[2]);
+    const on = r[0] === a && r[1] === b && r[2] === c ? ' on' : '';
+    return `<tr class="pick${on}" tabindex="0" data-r="${r.join(',')}"><td class="num"><bdi>${r.join(':')}</bdi></td><td class="n">${grams(q * r[0])}</td><td class="n">${grams(q * r[1])}</td><td class="n">${grams(q * r[2])}</td><td class="n">${fmtDur(peakHours(r[0], r[1], r[2], tC))}</td></tr>`;
+  }).join('');
+}
+$('ratioTable').addEventListener('click', e => applyRatio(e.target.closest('tr')));
+$('ratioTable').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); applyRatio(e.target.closest('tr')); } });
+function applyRatio(tr){
+  if (!tr) return;
+  const [a, b, c] = tr.dataset.r.split(',');
+  $('rS').value = a; $('rF').value = b; $('rW').value = c;
+  recalc(); save();
+}
+
+/* ================= water temp ================= */
+function renderWater(){
+  const ddt = toC(num('ddt')), room = toC(num('tRoom')), fl = toC(num('tFlour')), lv = toC(num('tLev'));
+  const fr = parseFloat($('friction').value) || 0;
+  const w = ddt * 4 - room - fl - lv - fr;
+  $('waterOut').textContent = fmtT(w);
+  $('thermoMark').style.left = clamp(w / 45 * 100, 0, 100) + '%';
+  $('tsLo').textContent = fmtT(0); $('tsHi').textContent = fmtT(45);
+  const notes = [];
+  if (w > 40) notes.push(['bad', t('wHot', { t: fmtT(40) })]);
+  else if (w < 2) notes.push(['warn', t('wCold')]);
+  else if (w < 12) notes.push(['', t('wCool')]);
+  else notes.push(['', t('wEasy')]);
+  notes.push(['', t('wCheck')]);
+  $('waterNotes').innerHTML = notes.map(n => `<div class="note ${n[0]}">${n[1]}</div>`).join('');
+  const labels = t('friction');
+  [...$('friction').options].forEach(o => {
+    const d = parseFloat(o.value) * (unit === 'C' ? 1 : 9 / 5);
+    o.textContent = t('frFmt', { l: labels[o.value], d: Math.round(d) + '°' + unit });
+  });
+}
+
+/* ================= schedule ================= */
+const RISE_T = [18, 20, 22, 24, 26, 28], RISE_P = [100, 85, 70, 50, 40, 30];
+function targetRise(tC){
+  if (tC <= RISE_T[0]) return RISE_P[0];
+  for (let i = 1; i < RISE_T.length; i++) if (tC <= RISE_T[i]) {
+    const f = (tC - RISE_T[i - 1]) / (RISE_T[i] - RISE_T[i - 1]);
+    return RISE_P[i - 1] + f * (RISE_P[i] - RISE_P[i - 1]);
+  }
+  return RISE_P[RISE_P.length - 1];
+}
+function bulkEstimate(tC){
+  const lev = Math.max(F.l, 0.02);
+  return clamp(5 * Math.pow(0.92, tC - 24) * Math.pow(0.2 / lev, 0.35) * (1 - 0.15 * F.wholeFrac), 2, 16);
+}
+function toLocalInput(d){ const p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
+function defaultSchedTime(){ const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0); return toLocalInput(d); }
+function renderSchedule(){
+  if (!$('schAt').value) $('schAt').value = defaultSchedTime();
+  const tC = toC(num('schTemp'));
+  const est = bulkEstimate(tC);
+  $('bulkAuto').textContent = t('bulkEst', { d: fmtDur(est) });
+  const bulkH = $('schBulk').value ? clamp(num('schBulk'), 0.5, 24) : est;
+  const auto = parseFloat($('schAutolyse').value) || 0;
+  const folds = Math.round(clamp(num('schFolds'), 0, 8)), gap = clamp(num('schFoldGap'), 5, 120);
+  const retard = clamp(num('schRetard'), 0, 72), cool = clamp(num('schCool'), 0, 600);
+  const levH = peakHours(num('rS'), num('rF'), num('rW'), toC(num('levTemp')));
+  const rise = Math.round(targetRise(tC) / 5) * 5;
+
+  const steps = [];
+  const bulkStart = auto;
+  steps.push({ m: bulkStart - levH * 60, t: t('sFeed', { r: `<bdi>${num('rS')}:${num('rF')}:${num('rW')}</bdi>` }), d: t('sFeedD', { g: grams(F.L + num('levKeep')), t: fmtT(toC(num('levTemp'))), d: fmtDur(levH) }), key: true });
+  if (auto > 0) {
+    steps.push({ m: 0, t: t('sAuto'), d: t('sAutoD', { f: grams(F.flours.reduce((a, f) => a + Math.max(f.mix, 0), 0)), w: grams(Math.max(F.mixWater * 0.94, 0)) }), key: true });
+    steps.push({ m: auto, t: t('sAddLev'), d: t('sAddLevD', { l: grams(F.L), s: grams(F.S), t: fmtT(tC) }), key: true });
+  } else {
+    steps.push({ m: 0, t: t('sMixAll'), d: t('sMixAllD', { t: fmtT(tC) }), key: true });
+  }
+  for (let i = 1; i <= folds; i++) {
+    steps.push({ m: bulkStart + i * gap, t: t('sFold', { i, n: folds }), d: i === 1 && F.I > 0 ? t('sFoldInc', { x: escapeHtml(incLabel()) }) : (i === folds ? t('sFoldLast') : ''), minor: true });
+  }
+  const bulkEnd = bulkStart + bulkH * 60;
+  steps.push({ m: bulkEnd, t: `${t('sBulkEnd')} <span class="pill">${t('risePill', { p: rise })}</span>`, d: t('sBulkEndD', { d: fmtDur(bulkH), t: fmtT(tC) }), key: true });
+  const shape = bulkEnd + 30;
+  steps.push({ m: shape, t: t('sShape'), d: t('sShapeD'), key: true });
+  let bake;
+  if (retard > 0) {
+    steps.push({ m: shape + 15, t: t('sFridge'), d: t('sFridgeD', { h: retard }), minor: true });
+    bake = shape + 15 + retard * 60;
+  } else {
+    const proofH = clamp(bulkH * 0.35, 1, 4);
+    steps.push({ m: shape, t: t('sRoomProof'), d: t('sRoomProofD', { d: fmtDur(proofH) }), minor: true });
+    bake = shape + proofH * 60;
+  }
+  steps.push({ m: bake - 60, t: t('sPreheat'), d: t('sPreheatD', { t: fmtT(250) }), minor: true });
+  steps.push({ m: bake, t: t('sBake'), d: t('sBakeD', { t: fmtT(250) }), key: true });
+  steps.push({ m: bake + 20, t: t('sLidOff'), d: t('sLidOffD', { t: fmtT(230), a: fmtT(96), b: fmtT(98) }), minor: true });
+  steps.push({ m: bake + 45, t: t('sOut'), d: t('sOutD'), key: true });
+  steps.push({ m: bake + 45 + cool, t: t('sSlice'), d: '', key: true });
+
+  const anchor = new Date($('schAt').value);
+  if (isNaN(anchor)) { $('timeline').innerHTML = `<p class="muted">${t('pickDate')}</p>`; return; }
+  const mixAt = $('anchorReady').checked ? new Date(anchor.getTime() - (bake + 45 + cool) * 60000) : anchor;
+  steps.sort((a, b) => a.m - b.m);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let lastDay = '', html = '';
+  steps.forEach(s => {
+    const d = new Date(mixAt.getTime() + s.m * 60000);
+    const day0 = new Date(d); day0.setHours(0, 0, 0, 0);
+    const diff = Math.round((day0 - today) / 86400000);
+    const rel = diff === 0 ? t('dayToday') : diff === 1 ? t('dayTomorrow') : diff === -1 ? t('dayYesterday') : '';
+    const dayLbl = (rel ? rel + ' · ' : '') + d.toLocaleDateString(loc(), { weekday: 'long', month: 'short', day: 'numeric' });
+    if (dayLbl !== lastDay) { html += `<div class="day">${dayLbl}</div>`; lastDay = dayLbl; }
+    const tm = d.toLocaleTimeString(loc(), { hour: '2-digit', minute: '2-digit' });
+    html += `<div class="step ${s.key ? 'key' : ''} ${s.minor ? 'minor' : ''}"><time>${tm}</time><span class="dot"></span><div><div class="t">${s.t}</div>${s.d ? `<div class="d">${s.d}</div>` : ''}</div></div>`;
+  });
+  $('timeline').innerHTML = html;
+  $('schSummary').textContent = t('tlSummary', { d: fmtDur((bake + 45 + cool - steps[0].m) / 60) });
+}
+
+/* ================= troubleshooting ================= */
+let fixFilter = 'All';
+function renderFix(){
+  const cats = t('cats');
+  $('fixFilters').innerHTML = Object.keys(cats).map(c => `<button type="button" class="chip" data-c="${c}" aria-pressed="${c === fixFilter}">${cats[c]}</button>`).join('');
+  $('issues').innerHTML = t('issues').filter(i => fixFilter === 'All' || i[0] === fixFilter).map(i => `
+    <details class="issue"><summary><h3>${escapeHtml(i[1])}</h3><span class="tag">${cats[i[0]]}</span></summary>
+      <div class="body"><h4>${t('causesH')}</h4><ul>${i[2].map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
+      <h4>${t('fixH')}</h4><ul>${i[3].map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul></div></details>`).join('');
+}
+$('fixFilters').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  fixFilter = b.dataset.c; renderFix();
+});
+
+/* ================= guide ================= */
+function renderGuide(){
+  $('process').innerHTML = t('process').map(p => `<li><div><b>${p[0]}</b><p>${p[1].replace('{hot}', fmtT(250)).replace('{mid}', fmtT(230))}</p></div></li>`).join('');
+  $('hydTable').innerHTML = t('hydRows').map(r => `<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td class="small muted">${r[2]}</td></tr>`).join('');
+}
+
+/* ================= language ================= */
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll('[data-i18n-list]').forEach(el => { el.innerHTML = t(el.dataset.i18nList).map(x => `<li>${x}</li>`).join(''); });
+  document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  renderPresets();
+}
+function setLang(l){
+  if (!STR[l]) return;
+  // swap the preset seed name if it is still the default text
+  const inc = $('incName');
+  if (inc.value === STR[lang].seedMix) inc.value = STR[l].seedMix;
+  lang = l;
+  applyStatic(); recalc(); renderRecipes();
+}
+document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { setLang(b.dataset.lang); save(); }));
+
+/* ================= glue ================= */
+function recalc(){
+  calcFormula(); renderFormula(); renderAnalyze(); renderLevain(); renderWater(); renderSchedule(); renderFix(); renderGuide();
+}
+function save(){
+  try {
+    const values = {};
+    document.querySelectorAll('main input[id], main select[id], main textarea[id]').forEach(el => {
+      values[el.id] = (el.type === 'radio' || el.type === 'checkbox') ? el.checked : el.value;
+    });
+    localStorage.setItem(STORE, JSON.stringify({ values, unit, lang }));
+  } catch (e) {}
+}
+function load(){
+  try {
+    const raw = localStorage.getItem(STORE); if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (s.unit === 'F') setUnit('F', false);
+    if (s.lang && STR[s.lang]) lang = s.lang;
+    Object.entries(s.values || {}).forEach(([id, v]) => {
+      const el = $(id); if (!el || el.readOnly) return;
+      if (el.type === 'radio' || el.type === 'checkbox') el.checked = !!v; else el.value = v;
+    });
+    return true;
+  } catch (e) { return false; }
+}
+function setUnit(u, convert = true){
+  if (u === unit) return;
+  if (convert) document.querySelectorAll('input.temp').forEach(el => {
+    const v = parseFloat(el.value); if (!isFinite(v)) return;
+    el.value = Math.round((u === 'F' ? v * 9 / 5 + 32 : (v - 32) * 5 / 9) * 2) / 2;
+  });
+  unit = u;
+  document.querySelectorAll('.tsfx').forEach(el => el.textContent = '°' + u);
+  document.querySelectorAll('[data-unit]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.unit === u)));
+}
+document.querySelectorAll('[data-unit]').forEach(b => b.addEventListener('click', () => { setUnit(b.dataset.unit); recalc(); save(); }));
+
+const FORMULA_IDS = ['hyd', 'salt', 'lev', 'levHyd', 'ww', 'rye', 'spelt', 'inc', 'incName'];
+document.querySelector('main').addEventListener('input', e => {
+  if (e.target.id === 'rName' || e.target.id === 'rNotes') { save(); return; }
+  if (FORMULA_IDS.includes(e.target.id)) markPreset(-1);
+  recalc(); save();
+});
+document.querySelector('main').addEventListener('change', e => {
+  if (e.target.id === 'rName' || e.target.id === 'rNotes') return;
+  recalc(); save();
+});
+
+const tabs = [...document.querySelectorAll('[role="tab"]')];
+function showTab(name){
+  if (!$('tab-' + name)) name = 'formula';
+  tabs.forEach(tb => tb.setAttribute('aria-selected', String(tb.dataset.tab === name)));
+  document.querySelectorAll('[role="tabpanel"]').forEach(p => p.hidden = p.id !== 'tab-' + name);
+  try { sessionStorage.setItem(STORE + '-tab', name); } catch (e) {}
+}
+tabs.forEach(tb => tb.addEventListener('click', () => showTab(tb.dataset.tab)));
+
+const restored = load();
+if (!restored) {
+  const nav = (navigator.language || '').toLowerCase();
+  if (nav.startsWith('he') || nav.startsWith('iw')) lang = 'he';
+}
+applyStatic();
+if (!restored) markPreset(0);
+recalc();
+let startTab = (location.hash || '').slice(1);
+if (!startTab) { try { startTab = sessionStorage.getItem(STORE + '-tab') || ''; } catch (e) {} }
+showTab(startTab || 'formula');
+initRecipes();
+})();
+</script>
+
+</body>
+</html>
