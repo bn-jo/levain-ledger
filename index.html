@@ -15,7 +15,7 @@
 :root{
   --bg:#EEF0EA; --surface:#FBFCF8; --sunk:#E4E7DF; --ink:#1B201C; --muted:#5C655D; --line:#D3D8CD;
   --accent:#27477A; --accent-soft:#DCE4F1; --on-accent:#FFFFFF;
-  --bread:#D8B467; --ww:#9A6232; --rye:#5A4535; --spelt:#B9925A; --water:#7FA6CF; --salt:#A9AFA6; --seed:#6E8B4E;
+  --bread:#D8B467; --ww:#9A6232; --rye:#5A4535; --spelt:#B9925A; --ap:#EAD9A2; --pizza:#C9B98A; --water:#7FA6CF; --salt:#A9AFA6; --seed:#6E8B4E;
   --good:#2F7A4B; --warn:#A8640F; --bad:#B23A2E; --warn-soft:#F6E8D2; --bad-soft:#F5DCD8;
   --display:"Bricolage Grotesque", "Heebo", "Segoe UI", system-ui, sans-serif;
   --body:"Figtree", "Heebo", "Segoe UI", system-ui, sans-serif;
@@ -30,7 +30,7 @@
     color-scheme:dark;
     --bg:#111412; --surface:#191D1A; --sunk:#0D0F0E; --ink:#E7EAE3; --muted:#99A299; --line:#2C322D;
     --accent:#93B3E3; --accent-soft:#1E2B40; --on-accent:#0F1724;
-    --bread:#E0C07A; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
+    --bread:#E0C07A; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --ap:#F0E2B4; --pizza:#B3A57C; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
     --good:#6CC28E; --warn:#E3A552; --bad:#EC8577; --warn-soft:#33281A; --bad-soft:#3A201C;
   }
 }
@@ -38,7 +38,7 @@
   color-scheme:dark;
   --bg:#111412; --surface:#191D1A; --sunk:#0D0F0E; --ink:#E7EAE3; --muted:#99A299; --line:#2C322D;
   --accent:#93B3E3; --accent-soft:#1E2B40; --on-accent:#0F1724;
-  --bread:#E0C07A; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
+  --bread:#E0C07A; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --ap:#F0E2B4; --pizza:#B3A57C; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
   --good:#6CC28E; --warn:#E3A552; --bad:#EC8577; --warn-soft:#33281A; --bad-soft:#3A201C;
 }
 *{box-sizing:border-box}
@@ -284,7 +284,7 @@ footer{color:var(--muted);font-size:.8rem;max-width:70ch}
           <div class="row"><label for="lev"><span data-i18n="lLev"></span><small data-i18n="sLev"></small></label><div class="field"><input id="lev" type="number" inputmode="decimal" min="1" max="60" step="1" value="20" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="levHyd"><span data-i18n="lLevHyd"></span><small data-i18n="sLevHyd"></small></label><div class="field"><input id="levHyd" type="number" inputmode="decimal" min="40" max="200" step="5" value="100" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="levFlour"><span data-i18n="lLevFlour"></span></label><div class="field"><select id="levFlour">
-            <option value="bread" data-i18n="fl_bread"></option><option value="ww" data-i18n="fl_ww"></option><option value="rye" data-i18n="fl_rye"></option><option value="spelt" data-i18n="fl_spelt"></option>
+            <option value="bread" data-i18n="fl_bread"></option><option value="ww" data-i18n="fl_ww"></option><option value="rye" data-i18n="fl_rye"></option><option value="spelt" data-i18n="fl_spelt"></option><option value="ap" data-i18n="fl_ap"></option><option value="pizza" data-i18n="fl_pizza"></option>
           </select></div></div>
         </fieldset>
         <hr>
@@ -293,6 +293,8 @@ footer{color:var(--muted);font-size:.8rem;max-width:70ch}
           <div class="row"><label for="ww"><span data-i18n="fl_ww"></span></label><div class="field"><input id="ww" type="number" inputmode="decimal" min="0" max="100" step="5" value="10" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="rye"><span data-i18n="fl_rye"></span></label><div class="field"><input id="rye" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="spelt"><span data-i18n="fl_spelt"></span></label><div class="field"><input id="spelt" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="ap"><span data-i18n="fl_ap"></span><small data-i18n="sAp"></small></label><div class="field"><input id="ap" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="pizza"><span data-i18n="fl_pizza"></span><small data-i18n="sPizza"></small></label><div class="field"><input id="pizza" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="breadPct"><span data-i18n="fl_bread"></span><small data-i18n="sBread"></small></label><div class="field"><input id="breadPct" type="number" readonly tabindex="-1" value="90" data-suffix><span class="sfx">%</span></div></div>
         </fieldset>
         <hr>
@@ -552,14 +554,16 @@ en: {
   tFormula: 'Formula', tRecipes: 'My recipes', tLevain: 'Levain build', tWater: 'Water temp', tSchedule: 'Bake schedule', tFix: 'Troubleshoot', tGuide: 'Method',
   g: 'g', h: 'h', min: 'min',
   fLede: "In baker's math, flour is always 100% and every other ingredient is a percentage of the flour weight. Totals here count the flour and water inside your levain, so the hydration you set is the true hydration of the dough.",
-  presets: ['Country loaf', 'First loaf (70%)', 'Open crumb', '50% whole wheat', 'Rye country', 'Seeded'],
+  presets: ['Country loaf', 'First loaf (70%)', 'Open crumb', '50% whole wheat', 'Rye country', 'Seeded', 'All-purpose loaf', 'Sourdough pizza'],
   seedMix: 'Toasted seed mix',
   lgBatch: 'Batch size', modeDough: 'By dough weight', modeFlour: 'By flour weight',
   lLoaves: 'Loaves', lLoafW: 'Dough per loaf', sLoafW: '~900 g fits a 9–10" banneton',
   lFlourTotal: 'Total flour', sFlourTotal: 'including flour in the levain',
   lgHyd: 'Hydration and salt', lHyd: 'Hydration', hydHint: 'Typical for this blend: {lo}–{hi}%', lSalt: 'Salt', sSalt: '1.8–2.2% is the usual range',
   lgLev: 'Levain', lLev: 'Levain', sLev: 'Levain weight as % of total flour', lLevHyd: 'Levain hydration', sLevHyd: '100% = equal flour and water', lLevFlour: 'Levain is fed with',
-  fl_bread: 'Bread flour', fl_ww: 'Whole wheat', fl_rye: 'Rye', fl_spelt: 'Spelt',
+  fl_bread: 'Bread flour', fl_ww: 'Whole wheat', fl_rye: 'Rye', fl_spelt: 'Spelt', fl_ap: 'All-purpose', fl_pizza: 'Pizza flour (00)', sAp: 'Softer dough, use less water', sPizza: 'For pizza and focaccia',
+  nPizza: '<b>Pizza dough:</b> set Loaves to the number of dough balls (250–280 g each for 30 cm pizzas). Bulk at room temperature, ball the dough, then cold proof 24–72 h. Bake as hot as your oven goes, on a preheated stone or steel.',
+  nAp: '<b>All-purpose flour</b> has less protein than bread flour, so the dough gets slack sooner. Keep hydration around 65–70% and handle it gently.',
   lgBlend: 'Flour blend', sBread: 'The rest of the blend',
   lgInc: 'Inclusions (optional)', lIncName: 'What', phInc: 'Seeds, olives, cheese…', lInc: 'Amount',
   stDoughL: 'Total dough', stFlourL: 'Total flour', stLevL: 'Levain needed', stPffL: 'Prefermented flour',
@@ -567,7 +571,7 @@ en: {
   sheetHint: 'Weigh the <b class="acc">Add to bowl</b> column',
   thIng: 'Ingredient', thPct: "Baker's %", thTotal: 'Total', thMix: 'Add to bowl',
   water: 'Water', salt: 'Salt', inclusions: 'Inclusions', levain: 'Levain', levHydSfx: '({h} hydration)', inTotals: 'in totals', flourInLev: 'flour in levain', waterInLev: 'water in levain', totalDough: 'Total dough',
-  nBlendOver: '<b>Blend is over 100%.</b> Whole wheat, rye and spelt add up to more than all the flour. Lower one of them.',
+  nBlendOver: '<b>Blend is over 100%.</b> The other flours add up to more than all the flour. Lower one of them.',
   nLevFlour: '<b>The levain uses more {f} than the formula has.</b> Lower the levain %, raise {f} in the blend, or feed the levain with a different flour.',
   nLevWater: '<b>The levain brings more water than the whole dough needs.</b> Raise hydration or lower levain %.',
   nWet: '<b>Wetter than usual for this blend.</b> Expect a slack dough. Hold back some water and add it after the first folds if it feels too loose.',
@@ -634,7 +638,7 @@ en: {
   causesH: 'Likely causes', fixH: 'Try next time',
   cats: { All: 'All', Crumb: 'Crumb', Shape: 'Shape', Crust: 'Crust', Flavor: 'Flavor', Dough: 'Dough', Starter: 'Starter' },
   gProcT: 'The process, start to finish', hydT: 'Hydration by flour', thTyp: 'Typical hydration', thWhy: 'Why',
-  hydRows: [['All-purpose', '65–70%', 'Less protein, gets slack fast'], ['Bread flour', '70–78%', 'Strong gluten, the easy baseline'], ['+20% whole wheat', '75–82%', 'Bran soaks up more water'], ['50%+ whole wheat', '80–88%', 'Needs extra water and a longer soak'], ['Rye heavy (40%+)', '80–90%', 'Pentosans hold water; dough is pasty'], ['Spelt', '65–72%', 'Weaker, extensible gluten']],
+  hydRows: [['All-purpose', '65–70%', 'Less protein, gets slack fast'], ['Pizza flour (00)', '60–70%', 'Finely milled, made to stretch thin'], ['Bread flour', '70–78%', 'Strong gluten, the easy baseline'], ['+20% whole wheat', '75–82%', 'Bran soaks up more water'], ['50%+ whole wheat', '80–88%', 'Needs extra water and a longer soak'], ['Rye heavy (40%+)', '80–90%', 'Pentosans hold water; dough is pasty'], ['Spelt', '65–72%', 'Weaker, extensible gluten']],
   hydTip: 'New to sourdough? Start at 68–72% with bread flour. Wet doughs are harder to shape, and a well-fermented 70% loaf beats a poorly handled 85% one.',
   bulkT: 'How to tell bulk is done',
   bulkList: ['Volume up by the target rise shown in your schedule. A straight-sided container with a rubber band makes this easy to read.', 'Domed, slightly puffy top that pulls away cleanly from the container edges.', 'Bubbles on the surface and along the sides; a jiggle when you shake the container.', 'The dough feels airy and lighter, no longer dense and tight.'],
@@ -677,14 +681,16 @@ he: {
   tFormula: 'מתכון', tRecipes: 'המתכונים שלי', tLevain: 'הכנת מחמצת', tWater: 'טמפ׳ מים', tSchedule: 'לוח זמנים', tFix: 'פתרון בעיות', tGuide: 'שיטה',
   g: 'ג׳', h: 'ש׳', min: 'דק׳',
   fLede: 'באחוזי אופה, הקמח הוא תמיד 100% וכל מרכיב אחר מחושב כאחוז ממשקל הקמח. הסכומים כאן כוללים את הקמח והמים שבתוך המחמצת, כך שההידרציה שתגדירו היא ההידרציה האמיתית של הבצק.',
-  presets: ['לחם כפרי', 'כיכר ראשונה (70%)', 'פירורית פתוחה', '50% קמח מלא', 'כפרי עם שיפון', 'עם זרעים'],
+  presets: ['לחם כפרי', 'כיכר ראשונה (70%)', 'פירורית פתוחה', '50% קמח מלא', 'כפרי עם שיפון', 'עם זרעים', 'כיכר מקמח רגיל', 'פיצה במחמצת'],
   seedMix: 'תערובת זרעים קלויה',
   lgBatch: 'גודל האפייה', modeDough: 'לפי משקל בצק', modeFlour: 'לפי משקל קמח',
   lLoaves: 'כיכרות', lLoafW: 'בצק לכיכר', sLoafW: 'כ-900 ג׳ מתאים לבנטון בקוטר 23–25 ס״מ',
   lFlourTotal: 'סך הקמח', sFlourTotal: 'כולל הקמח שבמחמצת',
   lgHyd: 'הידרציה ומלח', lHyd: 'הידרציה', hydHint: 'טיפוסי לתערובת הזו: {lo}–{hi}%', lSalt: 'מלח', sSalt: 'הטווח המקובל: 1.8–2.2%',
   lgLev: 'מחמצת (לבאן)', lLev: 'מחמצת', sLev: 'משקל המחמצת כאחוז מסך הקמח', lLevHyd: 'הידרציית מחמצת', sLevHyd: '100% = קמח ומים במשקל שווה', lLevFlour: 'המחמצת מוזנת ב',
-  fl_bread: 'קמח לחם', fl_ww: 'קמח מלא', fl_rye: 'שיפון', fl_spelt: 'כוסמין',
+  fl_bread: 'קמח לחם', fl_ww: 'קמח מלא', fl_rye: 'שיפון', fl_spelt: 'כוסמין', fl_ap: 'קמח לבן רגיל', fl_pizza: 'קמח לפיצה (00)', sAp: 'בצק רך יותר, צריך פחות מים', sPizza: 'לפיצה ולפוקאצ׳ה',
+  nPizza: '<b>בצק פיצה:</b> הגדירו ב״כיכרות״ את מספר כדורי הבצק (250–280 ג׳ לכל פיצה של 30 ס״מ). התפיחו בטמפ׳ החדר, חלקו לכדורים, ואז התפיחו במקרר 24–72 שעות. אפו בחום הכי גבוה של התנור, על אבן או פלטת פלדה שחוממו מראש.',
+  nAp: '<b>קמח לבן רגיל</b> מכיל פחות חלבון מקמח לחם, לכן הבצק נהיה רפוי מהר יותר. שמרו על הידרציה של כ-65–70% ועבדו איתו בעדינות.',
   lgBlend: 'תערובת קמחים', sBread: 'יתרת התערובת',
   lgInc: 'תוספות (לא חובה)', lIncName: 'מה', phInc: 'זרעים, זיתים, גבינה…', lInc: 'כמות',
   stDoughL: 'סך הבצק', stFlourL: 'סך הקמח', stLevL: 'מחמצת נדרשת', stPffL: 'קמח מותסס מראש',
@@ -692,7 +698,7 @@ he: {
   sheetHint: 'שקלו לפי עמודת <b class="acc">להוספה לקערה</b>',
   thIng: 'מרכיב', thPct: '% אופה', thTotal: 'סה״כ', thMix: 'להוספה לקערה',
   water: 'מים', salt: 'מלח', inclusions: 'תוספות', levain: 'מחמצת', levHydSfx: '(הידרציה {h})', inTotals: 'כלול בסה״כ', flourInLev: 'קמח במחמצת', waterInLev: 'מים במחמצת', totalDough: 'סך הבצק',
-  nBlendOver: '<b>התערובת עוברת 100%.</b> קמח מלא, שיפון וכוסמין יחד הם יותר מכל הקמח. הורידו אחד מהם.',
+  nBlendOver: '<b>התערובת עוברת 100%.</b> שאר הקמחים יחד הם יותר מכל הקמח. הורידו אחד מהם.',
   nLevFlour: '<b>המחמצת צורכת יותר {f} ממה שיש במתכון.</b> הורידו את אחוז המחמצת, העלו את ה{f} בתערובת, או הזינו את המחמצת בקמח אחר.',
   nLevWater: '<b>המחמצת מביאה יותר מים ממה שכל הבצק צריך.</b> העלו את ההידרציה או הורידו את אחוז המחמצת.',
   nWet: '<b>רטוב מהרגיל לתערובת הזו.</b> צפו לבצק רפוי. שמרו בצד חלק מהמים והוסיפו אותם אחרי הקיפולים הראשונים אם הבצק מרגיש רך מדי.',
@@ -759,7 +765,7 @@ he: {
   causesH: 'סיבות אפשריות', fixH: 'נסו בפעם הבאה',
   cats: { All: 'הכול', Crumb: 'פירורית', Shape: 'צורה', Crust: 'קרום', Flavor: 'טעם', Dough: 'בצק', Starter: 'מחמצת' },
   gProcT: 'התהליך מההתחלה ועד הסוף', hydT: 'הידרציה לפי סוג קמח', thTyp: 'הידרציה טיפוסית', thWhy: 'למה',
-  hydRows: [['קמח לבן רגיל', '65–70%', 'פחות חלבון, הבצק נהיה רפוי מהר'], ['קמח לחם', '70–78%', 'גלוטן חזק, נקודת פתיחה קלה'], ['+20% קמח מלא', '75–82%', 'הסובין סופג יותר מים'], ['50%+ קמח מלא', '80–88%', 'צריך יותר מים והשריה ארוכה'], ['הרבה שיפון (40%+)', '80–90%', 'הפנטוזנים מחזיקים מים; בצק דביק'], ['כוסמין', '65–72%', 'גלוטן חלש ונמתח']],
+  hydRows: [['קמח לבן רגיל', '65–70%', 'פחות חלבון, הבצק נהיה רפוי מהר'], ['קמח לפיצה (00)', '60–70%', 'טחינה דקה, נועד להימתח דק'], ['קמח לחם', '70–78%', 'גלוטן חזק, נקודת פתיחה קלה'], ['+20% קמח מלא', '75–82%', 'הסובין סופג יותר מים'], ['50%+ קמח מלא', '80–88%', 'צריך יותר מים והשריה ארוכה'], ['הרבה שיפון (40%+)', '80–90%', 'הפנטוזנים מחזיקים מים; בצק דביק'], ['כוסמין', '65–72%', 'גלוטן חלש ונמתח']],
   hydTip: 'מתחילים עם מחמצת? התחילו ב-68–72% עם קמח לחם. בצק רטוב קשה יותר לעיצוב, וכיכר של 70% שתססה טוב עדיפה על כיכר של 85% שלא טופלה נכון.',
   bulkT: 'איך יודעים שההתפחה הסתיימה',
   bulkList: ['הנפח גדל לפי תפיחת היעד שבלוח הזמנים. קופסה עם דפנות ישרות וגומייה לסימון מקלות על המדידה.', 'חלק עליון מקומר ותפוח מעט, שמשתחרר בקלות מדפנות הקופסה.', 'בועות על פני הבצק ולאורך הדפנות; הבצק רוטט כשמנערים את הקופסה.', 'הבצק מרגיש אוורירי וקל יותר, כבר לא צפוף ומתוח.'],
@@ -818,9 +824,9 @@ const fromC = c => unit === 'C' ? c : c * 9 / 5 + 32;
 const fmtT = c => Math.round(fromC(c)) + '°' + unit;
 const grams = x => (Math.abs(x) < 100 ? (Math.round(x * 10) / 10).toFixed(1) : Math.round(x).toLocaleString('en-US')) + ' ' + t('g');
 const pct = x => (Math.round(x * 10) / 10).toString().replace(/\.0$/, '') + '%';
-const FKEYS = ['bread', 'ww', 'rye', 'spelt'];
+const FKEYS = ['bread', 'ap', 'pizza', 'ww', 'rye', 'spelt'];
 const fname = k => t('fl_' + k);
-const FCOLOR = { bread: 'var(--bread)', ww: 'var(--ww)', rye: 'var(--rye)', spelt: 'var(--spelt)' };
+const FCOLOR = { bread: 'var(--bread)', ww: 'var(--ww)', rye: 'var(--rye)', spelt: 'var(--spelt)', ap: 'var(--ap)', pizza: 'var(--pizza)' };
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function fmtDur(h){
   const m = Math.round(h * 60); const hh = Math.floor(m / 60), mm = m % 60;
@@ -830,12 +836,14 @@ let F = {};
 
 /* ================= presets ================= */
 const PRESETS = [
-  { hyd: 75, salt: 2, lev: 20, levHyd: 100, ww: 10, rye: 0, spelt: 0, inc: 0, incName: '' },
-  { hyd: 70, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 0, spelt: 0, inc: 0, incName: '' },
-  { hyd: 80, salt: 2.1, lev: 15, levHyd: 100, ww: 5, rye: 5, spelt: 0, inc: 0, incName: '' },
-  { hyd: 84, salt: 2, lev: 20, levHyd: 100, ww: 50, rye: 0, spelt: 0, inc: 0, incName: '' },
-  { hyd: 80, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 25, spelt: 0, inc: 0, incName: '' },
-  { hyd: 78, salt: 2.2, lev: 20, levHyd: 100, ww: 15, rye: 0, spelt: 0, inc: 15, incName: '@seed' },
+  { hyd: 75, salt: 2, lev: 20, levHyd: 100, ww: 10, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 70, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 80, salt: 2.1, lev: 15, levHyd: 100, ww: 5, rye: 5, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 84, salt: 2, lev: 20, levHyd: 100, ww: 50, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 80, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 25, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 78, salt: 2.2, lev: 20, levHyd: 100, ww: 15, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 15, incName: '@seed' },
+  { hyd: 68, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 0, spelt: 0, ap: 100, pizza: 0, inc: 0, incName: '' },
+  { hyd: 65, salt: 2.8, lev: 15, levHyd: 100, ww: 0, rye: 0, spelt: 0, ap: 0, pizza: 100, inc: 0, incName: '', levFlour: 'pizza', loaves: 4, loafWeight: 260 },
 ];
 let presetOn = -1;
 function renderPresets(){
@@ -844,6 +852,8 @@ function renderPresets(){
 $('presets').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   const i = +b.dataset.i;
+  $('levFlour').value = 'bread';
+  if (presetOn === PRESETS.length - 1 && i !== presetOn) { $('loaves').value = 2; $('loafWeight').value = 900; }
   Object.entries(PRESETS[i]).forEach(([k, v]) => { $(k).value = v === '@seed' ? t('seedMix') : v; });
   markPreset(i); recalc(); save();
 });
@@ -855,8 +865,8 @@ function calcFormula(){
   $('doughModeFields').hidden = mode !== 'dough';
   $('flourModeFields').hidden = mode !== 'flour';
   const h = num('hyd') / 100, s = num('salt') / 100, l = num('lev') / 100, lh = num('levHyd') / 100, inc = num('inc') / 100;
-  const share = { ww: num('ww') / 100, rye: num('rye') / 100, spelt: num('spelt') / 100 };
-  share.bread = 1 - share.ww - share.rye - share.spelt;
+  const share = { ww: num('ww') / 100, rye: num('rye') / 100, spelt: num('spelt') / 100, ap: num('ap') / 100, pizza: num('pizza') / 100 };
+  share.bread = 1 - share.ww - share.rye - share.spelt - share.ap - share.pizza;
   $('breadPct').value = Math.round(share.bread * 1000) / 10;
   const doughTarget = num('loaves') * num('loafWeight');
   const flour = mode === 'dough' ? doughTarget / (1 + h + s + inc) : num('flourTotal');
@@ -903,7 +913,7 @@ function renderFormula(){
   $('legend').innerHTML = segs.map(s => `<span><span class="sw" style="background:${s[2]}"></span>${escapeHtml(s[0])} ${Math.round(s[1] / tot * 100)}%</span>`).join('');
 
   const notes = [];
-  const lo = Math.round(68 + 12 * r.share.ww + 18 * r.share.rye - 4 * Math.max(r.share.spelt, 0));
+  const lo = Math.round(68 + 12 * r.share.ww + 18 * r.share.rye - 4 * Math.max(r.share.spelt, 0) - 3 * r.share.ap - 7 * r.share.pizza);
   const hi = lo + 8;
   $('hydHint').textContent = t('hydHint', { lo, hi });
   const lfName = lang === 'en' ? fname(r.levFlour).toLowerCase() : fname(r.levFlour);
@@ -913,7 +923,9 @@ function renderFormula(){
   if (r.mixWater < 0) notes.push(['bad', t('nLevWater')]);
   if (r.h * 100 > hi + 2) notes.push(['warn', t('nWet')]);
   if (r.h * 100 < lo - 4) notes.push(['warn', t('nDry')]);
-  if (r.s * 100 > 2.5) notes.push(['warn', t('nSaltHi')]);
+  if (r.s * 100 > (r.share.pizza >= 0.5 ? 3.2 : 2.5)) notes.push(['warn', t('nSaltHi')]);
+  if (r.share.pizza >= 0.5) notes.push(['', t('nPizza')]);
+  if (r.share.ap >= 0.5) notes.push(['', t('nAp')]);
   if (r.s > 0 && r.s * 100 < 1.6) notes.push(['warn', t('nSaltLo')]);
   if (r.l * 100 > 30) notes.push(['warn', t('nLevHi')]);
   if (r.l * 100 < 10) notes.push(['warn', t('nLevLo')]);
@@ -944,7 +956,7 @@ $('aLoad').addEventListener('click', () => {
 });
 
 /* ================= saved recipes ================= */
-const RECIPE_FIELDS = ['loaves', 'loafWeight', 'flourTotal', 'hyd', 'salt', 'lev', 'levHyd', 'levFlour', 'ww', 'rye', 'spelt', 'incName', 'inc'];
+const RECIPE_FIELDS = ['loaves', 'loafWeight', 'flourTotal', 'hyd', 'salt', 'lev', 'levHyd', 'levFlour', 'ww', 'rye', 'spelt', 'ap', 'pizza', 'incName', 'inc'];
 let store = { kind: 'pending' }; // pending | cloud | local
 let recipes = [];
 function readLocalRecipes(){ try { return JSON.parse(localStorage.getItem(RECIPES_LOCAL) || '[]'); } catch (e) { return []; } }
@@ -1264,7 +1276,7 @@ function setUnit(u, convert = true){
 }
 document.querySelectorAll('[data-unit]').forEach(b => b.addEventListener('click', () => { setUnit(b.dataset.unit); recalc(); save(); }));
 
-const FORMULA_IDS = ['hyd', 'salt', 'lev', 'levHyd', 'ww', 'rye', 'spelt', 'inc', 'incName'];
+const FORMULA_IDS = ['hyd', 'salt', 'lev', 'levHyd', 'ww', 'rye', 'spelt', 'ap', 'pizza', 'inc', 'incName'];
 document.querySelector('main').addEventListener('input', e => {
   if (e.target.id === 'rName' || e.target.id === 'rNotes') { save(); return; }
   if (FORMULA_IDS.includes(e.target.id)) markPreset(-1);
