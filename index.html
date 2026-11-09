@@ -15,7 +15,7 @@
 :root{
   --bg:#EEF0EA; --surface:#FBFCF8; --sunk:#E4E7DF; --ink:#1B201C; --muted:#5C655D; --line:#D3D8CD;
   --accent:#27477A; --accent-soft:#DCE4F1; --on-accent:#FFFFFF;
-  --bread:#D8B467; --ww:#9A6232; --rye:#5A4535; --spelt:#B9925A; --ap:#EAD9A2; --pizza:#C9B98A; --water:#7FA6CF; --salt:#A9AFA6; --seed:#6E8B4E;
+  --bread:#D8B467; --mani:#C9967A; --t63:#E4C48C; --c1:#8E7CC3; --c2:#4F9C93; --c3:#C27BA0; --c4:#7A9A3A; --ww:#9A6232; --rye:#5A4535; --spelt:#B9925A; --ap:#EAD9A2; --pizza:#C9B98A; --water:#7FA6CF; --salt:#A9AFA6; --seed:#6E8B4E;
   --good:#2F7A4B; --warn:#A8640F; --bad:#B23A2E; --warn-soft:#F6E8D2; --bad-soft:#F5DCD8;
   --display:"Bricolage Grotesque", "Heebo", "Segoe UI", system-ui, sans-serif;
   --body:"Figtree", "Heebo", "Segoe UI", system-ui, sans-serif;
@@ -30,7 +30,7 @@
     color-scheme:dark;
     --bg:#111412; --surface:#191D1A; --sunk:#0D0F0E; --ink:#E7EAE3; --muted:#99A299; --line:#2C322D;
     --accent:#93B3E3; --accent-soft:#1E2B40; --on-accent:#0F1724;
-    --bread:#E0C07A; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --ap:#F0E2B4; --pizza:#B3A57C; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
+    --bread:#E0C07A; --mani:#DDAE93; --t63:#EBD09E; --c1:#B3A5E0; --c2:#76C2B8; --c3:#E0A0C2; --c4:#A3C266; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --ap:#F0E2B4; --pizza:#B3A57C; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
     --good:#6CC28E; --warn:#E3A552; --bad:#EC8577; --warn-soft:#33281A; --bad-soft:#3A201C;
   }
 }
@@ -38,7 +38,7 @@
   color-scheme:dark;
   --bg:#111412; --surface:#191D1A; --sunk:#0D0F0E; --ink:#E7EAE3; --muted:#99A299; --line:#2C322D;
   --accent:#93B3E3; --accent-soft:#1E2B40; --on-accent:#0F1724;
-  --bread:#E0C07A; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --ap:#F0E2B4; --pizza:#B3A57C; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
+  --bread:#E0C07A; --mani:#DDAE93; --t63:#EBD09E; --c1:#B3A5E0; --c2:#76C2B8; --c3:#E0A0C2; --c4:#A3C266; --ww:#C98C55; --rye:#A88A70; --spelt:#CFAE79; --ap:#F0E2B4; --pizza:#B3A57C; --water:#7FA6CF; --salt:#7D847B; --seed:#93B06F;
   --good:#6CC28E; --warn:#E3A552; --bad:#EC8577; --warn-soft:#33281A; --bad-soft:#3A201C;
 }
 *{box-sizing:border-box}
@@ -211,6 +211,13 @@ ol.process li::before{content:counter(s);font:700 .9rem var(--mono);color:var(--
 ol.process b{display:block}
 ol.process p{color:var(--muted);font-size:.9rem}
 .signs{margin:0;padding-inline-start:18px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.row.cf{grid-template-columns:minmax(0,1fr) 120px 30px}
+.iconbtn{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;height:34px;cursor:pointer;font:600 1rem var(--body)}
+.iconbtn:hover{color:var(--bad);border-color:var(--bad)}
+.cf-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px;border:1px dashed var(--line);border-radius:10px}
+.cf-form > div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cf-form .span{grid-column:1/-1}
+.cf-form label{font-size:.8rem;color:var(--muted)}
 footer{color:var(--muted);font-size:.8rem;max-width:70ch}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -284,18 +291,30 @@ footer{color:var(--muted);font-size:.8rem;max-width:70ch}
           <div class="row"><label for="lev"><span data-i18n="lLev"></span><small data-i18n="sLev"></small></label><div class="field"><input id="lev" type="number" inputmode="decimal" min="1" max="60" step="1" value="20" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="levHyd"><span data-i18n="lLevHyd"></span><small data-i18n="sLevHyd"></small></label><div class="field"><input id="levHyd" type="number" inputmode="decimal" min="40" max="200" step="5" value="100" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="levFlour"><span data-i18n="lLevFlour"></span></label><div class="field"><select id="levFlour">
-            <option value="bread" data-i18n="fl_bread"></option><option value="ww" data-i18n="fl_ww"></option><option value="rye" data-i18n="fl_rye"></option><option value="spelt" data-i18n="fl_spelt"></option><option value="ap" data-i18n="fl_ap"></option><option value="pizza" data-i18n="fl_pizza"></option>
+            <option value="bread" data-i18n="fl_bread"></option><option value="mani" data-i18n="fl_mani"></option><option value="t63" data-i18n="fl_t63"></option><option value="ww" data-i18n="fl_ww"></option><option value="rye" data-i18n="fl_rye"></option><option value="spelt" data-i18n="fl_spelt"></option><option value="ap" data-i18n="fl_ap"></option><option value="pizza" data-i18n="fl_pizza"></option>
           </select></div></div>
         </fieldset>
         <hr>
         <fieldset>
           <legend data-i18n="lgBlend"></legend>
+          <div class="row"><label for="mani"><span data-i18n="fl_mani"></span><small data-i18n="sMani"></small></label><div class="field"><input id="mani" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
+          <div class="row"><label for="t63"><span data-i18n="fl_t63"></span><small data-i18n="sT63"></small></label><div class="field"><input id="t63" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="ww"><span data-i18n="fl_ww"></span></label><div class="field"><input id="ww" type="number" inputmode="decimal" min="0" max="100" step="5" value="10" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="rye"><span data-i18n="fl_rye"></span></label><div class="field"><input id="rye" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="spelt"><span data-i18n="fl_spelt"></span></label><div class="field"><input id="spelt" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="ap"><span data-i18n="fl_ap"></span><small data-i18n="sAp"></small></label><div class="field"><input id="ap" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
           <div class="row"><label for="pizza"><span data-i18n="fl_pizza"></span><small data-i18n="sPizza"></small></label><div class="field"><input id="pizza" type="number" inputmode="decimal" min="0" max="100" step="5" value="0" data-suffix><span class="sfx">%</span></div></div>
+          <div id="cfRows" class="stack" style="gap:10px"></div>
           <div class="row"><label for="breadPct"><span data-i18n="fl_bread"></span><small data-i18n="sBread"></small></label><div class="field"><input id="breadPct" type="number" readonly tabindex="-1" value="90" data-suffix><span class="sfx">%</span></div></div>
+          <button type="button" class="btn ghost small" id="cfAddBtn" style="align-self:flex-start" data-i18n="cfAdd"></button>
+          <div class="cf-form" id="cfForm" hidden>
+            <div class="span"><label for="cfName" data-i18n="cfName"></label><input id="cfName" class="plain" type="text" maxlength="40" data-i18n-ph="cfNamePh"></div>
+            <div><label for="cfProtein" data-i18n="cfProtein"></label><div class="field"><input id="cfProtein" type="number" inputmode="decimal" min="5" max="20" step="0.5" value="12" data-suffix><span class="sfx">%</span></div></div>
+            <div><label for="cfGrade" data-i18n="cfGrade"></label><select id="cfGrade" class="full"><option value="00" data-i18n="gr_00"></option><option value="0" selected data-i18n="gr_0"></option><option value="1" data-i18n="gr_1"></option><option value="2" data-i18n="gr_2"></option><option value="whole" data-i18n="gr_whole"></option></select></div>
+            <div class="span"><label for="cfGrain" data-i18n="cfGrain"></label><select id="cfGrain" class="full"><option value="wheat" data-i18n="gn_wheat"></option><option value="durum" data-i18n="gn_durum"></option><option value="spelt" data-i18n="gn_spelt"></option><option value="rye" data-i18n="gn_rye"></option></select></div>
+            <p class="span small muted" id="cfPreview"></p>
+            <div class="span" style="flex-direction:row;gap:8px"><button class="btn small" id="cfSave" type="button" data-i18n="cfSave"></button><button class="btn small ghost" id="cfCancel" type="button" data-i18n="cfCancel"></button></div>
+          </div>
         </fieldset>
         <hr>
         <fieldset>
@@ -487,6 +506,7 @@ footer{color:var(--muted);font-size:.8rem;max-width:70ch}
           <div class="row"><label for="schTemp"><span data-i18n="lSchTemp"></span></label><div class="field"><input id="schTemp" class="temp" type="number" inputmode="decimal" step="0.5" value="25" data-suffix><span class="sfx tsfx">°C</span></div></div>
           <div class="row"><label for="schBulk"><span data-i18n="lSchBulk"></span><small id="bulkAuto"></small></label><div class="field"><input id="schBulk" type="number" inputmode="decimal" min="1" max="24" step="0.25" data-i18n-ph="phAuto" data-suffix><span class="sfx" data-i18n="h"></span></div></div>
           <div class="row"><label for="schAutolyse"><span data-i18n="lAutolyse"></span></label><div class="field"><select id="schAutolyse"><option value="0" data-i18n="aNone"></option><option value="30" data-i18n="a30"></option><option value="60" selected data-i18n="a60"></option><option value="120" data-i18n="a120"></option></select></div></div>
+          <div class="row wide"><label for="schMix"><span data-i18n="lMix"></span></label><div class="field"><select id="schMix"><option value="1.5"></option><option value="0"></option><option value="13"></option><option value="15"></option></select></div></div>
           <div class="row"><label for="schFolds"><span data-i18n="lFolds"></span></label><div class="field"><input id="schFolds" type="number" inputmode="decimal" min="0" max="8" step="1" value="4"></div></div>
           <div class="row"><label for="schFoldGap"><span data-i18n="lFoldGap"></span></label><div class="field"><input id="schFoldGap" type="number" inputmode="decimal" min="10" max="90" step="5" value="30" data-suffix><span class="sfx" data-i18n="min"></span></div></div>
         </fieldset>
@@ -514,9 +534,16 @@ footer{color:var(--muted);font-size:.8rem;max-width:70ch}
   <!-- GUIDE -->
   <section class="panel" id="tab-guide" role="tabpanel" hidden>
     <div class="guide">
+      <div class="stack">
       <div class="card stack">
         <h2 data-i18n="gProcT"></h2>
         <ol class="process" id="process"></ol>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:10px" data-i18n="mixT"></h3>
+        <ul class="signs" data-i18n-list="mixList"></ul>
+        <p class="muted small" style="margin-top:10px" data-i18n="mixTip"></p>
+      </div>
       </div>
       <div class="stack">
         <div class="card">
@@ -561,8 +588,18 @@ en: {
   lFlourTotal: 'Total flour', sFlourTotal: 'including flour in the levain',
   lgHyd: 'Hydration and salt', lHyd: 'Hydration', hydHint: 'Typical for this blend: {lo}–{hi}%', lSalt: 'Salt', sSalt: '1.8–2.2% is the usual range',
   lgLev: 'Levain', lLev: 'Levain', sLev: 'Levain weight as % of total flour', lLevHyd: 'Levain hydration', sLevHyd: '100% = equal flour and water', lLevFlour: 'Levain is fed with',
-  fl_bread: 'Bread flour', fl_ww: 'Whole wheat', fl_rye: 'Rye', fl_spelt: 'Spelt', fl_ap: 'All-purpose', fl_pizza: 'Pizza flour (00)', sAp: 'Softer dough, use less water', sPizza: 'For pizza and focaccia',
+  fl_bread: 'Bread flour', fl_ww: 'Whole wheat', fl_rye: 'Rye', fl_spelt: 'Spelt', fl_ap: 'All-purpose', fl_pizza: 'Pizza flour (00)', fl_mani: 'Manitoba', sMani: 'Very strong, takes more water', sAp: 'Softer dough, use less water', sPizza: 'For pizza and focaccia',
   nPizza: '<b>Pizza dough:</b> set Loaves to the number of dough balls (250–280 g each for 30 cm pizzas). Bulk at room temperature, ball the dough, then cold proof 24–72 h. Bake as hot as your oven goes, on a preheated stone or steel.',
+  nMani: '<b>Manitoba flour</b> has 13–15% protein, so it absorbs more water and builds strong gluten. It suits high hydration and long cold ferments. Give it a longer autolyse and an extra set of folds.',
+  fl_t63: 'T63 flour', sT63: 'Light bread flour, ~0.63% ash',
+  cfAdd: '+ Add your own flour', cfName: 'Name', cfNamePh: 'Caputo Nuvola, local mill…', cfProtein: 'Protein', cfGrade: 'Grade (milling)', cfGrain: 'Grain',
+  gr_00: 'Type 00', gr_0: 'Type 0', gr_1: 'Type 1', gr_2: 'Type 2', gr_whole: 'Whole grain',
+  gn_wheat: 'Wheat (generic)', gn_durum: 'Durum / semola', gn_spelt: 'Spelt or ancient grain', gn_rye: 'Rye',
+  str_weak: 'weak', str_medium: 'medium', str_strong: 'strong', str_vstrong: 'very strong',
+  cfMeta: '{g} · {p}% protein · {s}', cfPreview: 'Gluten: {s} · on its own it wants about {lo}–{hi}% hydration',
+  cfSave: 'Add flour', cfCancel: 'Cancel', cfRemove: 'Remove flour',
+  nCfWeak: '<b>{f} is a weak flour.</b> Keep hydration moderate, handle it gently and expect a shorter bulk.',
+  nCfStrong: '<b>{f} is very strong.</b> It can take more water and benefits from a longer autolyse or more mixing.',
   nAp: '<b>All-purpose flour</b> has less protein than bread flour, so the dough gets slack sooner. Keep hydration around 65–70% and handle it gently.',
   lgBlend: 'Flour blend', sBread: 'The rest of the blend',
   lgInc: 'Inclusions (optional)', lIncName: 'What', phInc: 'Seeds, olives, cheese…', lInc: 'Amount',
@@ -625,6 +662,10 @@ en: {
   sAuto: 'Mix flour and water (autolyse)', sAutoD: '{f} flour with {w} water. Cover and rest.',
   sAddLev: 'Add levain, then salt', sAddLevD: '{l} levain, then {s} salt with the held-back water. Pinch and fold until combined. Aim for {t} dough.',
   sMixAll: 'Mix everything', sMixAllD: 'Levain, water, flour, then salt. Aim for {t} dough.',
+  kStand: 'Knead on medium-low (KitchenAid 2–3, Kenwood 1–2) for 5–8 min until smooth and pulling away from the bowl.',
+  kSpiral: 'Knead on 1st speed for 3–4 min, then 2nd speed for 3–5 min until smooth and elastic.',
+  sAddLevMx: '{l} levain on low speed for 2 min. {k} Add {s} salt in the last 2 min, then trickle in the held-back water. Aim for {t} dough and check the windowpane.',
+  sMixAllMx: 'Water, levain, then flour on low speed for 3 min. {k} Add the salt in the last 2 min. Aim for {t} dough.',
   sFold: 'Stretch and fold, set {i} of {n}', sFoldInc: 'Laminate or fold in the {x} now.', sFoldLast: 'Then leave the dough alone, covered.',
   sBulkEnd: 'End of bulk, preshape', risePill: '~{p}% rise', sBulkEndD: 'Bulk ≈ {d} at {t}. Go by the dough: domed, jiggly, bubbles on the sides. Preshape into a round and rest 20–30 min uncovered.',
   sShape: 'Final shape', sShapeD: 'Shape tight, then into a floured banneton seam-side up.',
@@ -638,8 +679,11 @@ en: {
   causesH: 'Likely causes', fixH: 'Try next time',
   cats: { All: 'All', Crumb: 'Crumb', Shape: 'Shape', Crust: 'Crust', Flavor: 'Flavor', Dough: 'Dough', Starter: 'Starter' },
   gProcT: 'The process, start to finish', hydT: 'Hydration by flour', thTyp: 'Typical hydration', thWhy: 'Why',
-  hydRows: [['All-purpose', '65–70%', 'Less protein, gets slack fast'], ['Pizza flour (00)', '60–70%', 'Finely milled, made to stretch thin'], ['Bread flour', '70–78%', 'Strong gluten, the easy baseline'], ['+20% whole wheat', '75–82%', 'Bran soaks up more water'], ['50%+ whole wheat', '80–88%', 'Needs extra water and a longer soak'], ['Rye heavy (40%+)', '80–90%', 'Pentosans hold water; dough is pasty'], ['Spelt', '65–72%', 'Weaker, extensible gluten']],
+  hydRows: [['All-purpose', '65–70%', 'Less protein, gets slack fast'], ['Pizza flour (00)', '60–70%', 'Finely milled, made to stretch thin'], ['Bread flour', '70–78%', 'Strong gluten, the easy baseline'], ['Manitoba', '74–85%', 'Very high protein, soaks up more water'], ['T63', '68–75%', 'Light bread flour (~0.63% ash), mild and versatile'], ['+20% whole wheat', '75–82%', 'Bran soaks up more water'], ['50%+ whole wheat', '80–88%', 'Needs extra water and a longer soak'], ['Rye heavy (40%+)', '80–90%', 'Pentosans hold water; dough is pasty'], ['Spelt', '65–72%', 'Weaker, extensible gluten']],
   hydTip: 'New to sourdough? Start at 68–72% with bread flour. Wet doughs are harder to shape, and a well-fermented 70% loaf beats a poorly handled 85% one.',
+  mixT: 'Kneading with a mixer',
+  mixList: ['<b>Which tool:</b> use the dough hook on a stand mixer. A spiral mixer is gentler and handles wet dough better.', '<b>Start slow:</b> mix the flour, most of the water and the levain on low (speed 1) for 2–3 min until no dry flour is left. Rest 20–30 min if you can.', '<b>Develop the gluten:</b> stand mixer on medium-low (KitchenAid 2–3, Kenwood 1–2) for 5–8 min; spiral mixer on 1st speed for 3–4 min, then 2nd speed for 3–5 min. Never run a stand mixer on high with stiff dough, it strains the motor.', '<b>Salt and extra water:</b> add the salt in the last 2 minutes. For wet doughs, trickle the held-back water in slowly on low (bassinage), only once the dough is already strong.', '<b>When to stop:</b> the dough is smooth, glossy and cleans the bowl, and a small piece stretches thin enough to see light through (windowpane test). For open-crumb loaves stop a bit earlier and let the folds finish the job.', '<b>Watch the heat:</b> a mixer adds 10–15°C (18–27°F) of friction heat. Pick your mixer under Mixing (Water temp or Bake schedule) so the water is cooler, and stop if the dough goes above 27°C (80°F).', '<b>Fewer folds:</b> machine-kneaded dough needs only 1–2 sets of coil folds during bulk.'],
+  mixTip: 'Small batches (under about 500 g flour) tend to spin around the hook in a big mixer. Mix them by hand or double the batch. High-protein flours like Manitoba need longer kneading.',
   bulkT: 'How to tell bulk is done',
   bulkList: ['Volume up by the target rise shown in your schedule. A straight-sided container with a rubber band makes this easy to read.', 'Domed, slightly puffy top that pulls away cleanly from the container edges.', 'Bubbles on the surface and along the sides; a jiggle when you shake the container.', 'The dough feels airy and lighter, no longer dense and tight.'],
   bulkTip: 'An aliquot jar helps: put a small piece of dough in a shot glass right after mixing and track its rise.',
@@ -650,7 +694,7 @@ en: {
   process: [
     ['Feed the levain', 'Build fresh levain from your starter so it peaks when you mix. See the Levain build tab.'],
     ['Autolyse (optional)', 'Mix flour and most of the water, rest 30–60 min. Gluten starts forming on its own and the dough gets easier to handle.'],
-    ['Mix', 'Add ripe levain, then salt with the held-back water. Squeeze and fold until fully combined. Check the dough temperature.'],
+    ['Mix', 'Add ripe levain, then salt with the held-back water. By hand, squeeze and fold until fully combined; with a mixer, see Kneading with a mixer. Check the dough temperature.'],
     ['Bulk fermentation with folds', 'Do 3–4 sets of stretch-and-folds or coil folds every 30 min, then leave it. Bulk ends on volume rise and feel, not the clock.'],
     ['Preshape and bench rest', 'Turn out, gently round it, rest 20–30 min until it relaxes and spreads slightly.'],
     ['Final shape', 'Build surface tension into a boule or batard, then place seam-up in a floured banneton. Rice flour prevents sticking.'],
@@ -688,8 +732,18 @@ he: {
   lFlourTotal: 'סך הקמח', sFlourTotal: 'כולל הקמח שבמחמצת',
   lgHyd: 'הידרציה ומלח', lHyd: 'הידרציה', hydHint: 'טיפוסי לתערובת הזו: {lo}–{hi}%', lSalt: 'מלח', sSalt: 'הטווח המקובל: 1.8–2.2%',
   lgLev: 'מחמצת (לבאן)', lLev: 'מחמצת', sLev: 'משקל המחמצת כאחוז מסך הקמח', lLevHyd: 'הידרציית מחמצת', sLevHyd: '100% = קמח ומים במשקל שווה', lLevFlour: 'המחמצת מוזנת ב',
-  fl_bread: 'קמח לחם', fl_ww: 'קמח מלא', fl_rye: 'שיפון', fl_spelt: 'כוסמין', fl_ap: 'קמח לבן רגיל', fl_pizza: 'קמח לפיצה (00)', sAp: 'בצק רך יותר, צריך פחות מים', sPizza: 'לפיצה ולפוקאצ׳ה',
+  fl_bread: 'קמח לחם', fl_ww: 'קמח מלא', fl_rye: 'שיפון', fl_spelt: 'כוסמין', fl_ap: 'קמח לבן רגיל', fl_pizza: 'קמח לפיצה (00)', fl_mani: 'קמח מניטובה', sMani: 'חזק מאוד, סופג יותר מים', sAp: 'בצק רך יותר, צריך פחות מים', sPizza: 'לפיצה ולפוקאצ׳ה',
   nPizza: '<b>בצק פיצה:</b> הגדירו ב״כיכרות״ את מספר כדורי הבצק (250–280 ג׳ לכל פיצה של 30 ס״מ). התפיחו בטמפ׳ החדר, חלקו לכדורים, ואז התפיחו במקרר 24–72 שעות. אפו בחום הכי גבוה של התנור, על אבן או פלטת פלדה שחוממו מראש.',
+  nMani: '<b>קמח מניטובה</b> מכיל 13–15% חלבון, לכן הוא סופג יותר מים ובונה גלוטן חזק. מתאים להידרציה גבוהה ולהתפחה ארוכה במקרר. תנו לו אוטוליזה ארוכה יותר וסבב קיפולים נוסף.',
+  fl_t63: 'קמח T63', sT63: 'קמח לחם בהיר, כ-0.63% אפר',
+  cfAdd: '+ הוספת קמח משלכם', cfName: 'שם', cfNamePh: 'קמח מהטחנה המקומית…', cfProtein: 'חלבון', cfGrade: 'דרגת טחינה', cfGrain: 'סוג דגן',
+  gr_00: 'סוג 00', gr_0: 'סוג 0', gr_1: 'סוג 1', gr_2: 'סוג 2', gr_whole: 'מלא',
+  gn_wheat: 'חיטה (רגיל)', gn_durum: 'חיטת דורום / סמולינה', gn_spelt: 'כוסמין או דגן עתיק', gn_rye: 'שיפון',
+  str_weak: 'חלש', str_medium: 'בינוני', str_strong: 'חזק', str_vstrong: 'חזק מאוד',
+  cfMeta: '{g} · {p}% חלבון · {s}', cfPreview: 'גלוטן: {s} · לבד הוא צריך הידרציה של כ-{lo}–{hi}%',
+  cfSave: 'הוספה', cfCancel: 'ביטול', cfRemove: 'הסרת קמח',
+  nCfWeak: '<b>{f} הוא קמח חלש.</b> שמרו על הידרציה מתונה, עבדו בעדינות וצפו להתפחה קצרה יותר.',
+  nCfStrong: '<b>{f} חזק מאוד.</b> הוא יכול לקבל יותר מים ומרוויח מאוטוליזה ארוכה או מלישה ארוכה יותר.',
   nAp: '<b>קמח לבן רגיל</b> מכיל פחות חלבון מקמח לחם, לכן הבצק נהיה רפוי מהר יותר. שמרו על הידרציה של כ-65–70% ועבדו איתו בעדינות.',
   lgBlend: 'תערובת קמחים', sBread: 'יתרת התערובת',
   lgInc: 'תוספות (לא חובה)', lIncName: 'מה', phInc: 'זרעים, זיתים, גבינה…', lInc: 'כמות',
@@ -752,6 +806,10 @@ he: {
   sAuto: 'ערבוב קמח ומים (אוטוליזה)', sAutoD: '{f} קמח עם {w} מים. כסו והניחו לנוח.',
   sAddLev: 'הוספת מחמצת ואז מלח', sAddLevD: '{l} מחמצת, ואחריה {s} מלח עם המים ששמרתם בצד. צבטו וקפלו עד שהכול מתאחד. כוונו לבצק בטמפ׳ {t}.',
   sMixAll: 'ערבוב כל המרכיבים', sMixAllD: 'מחמצת, מים, קמח ואז מלח. כוונו לבצק בטמפ׳ {t}.',
+  kStand: 'לושו במהירות בינונית-נמוכה (קיצ׳נאייד 2–3, קנווד 1–2) במשך 5–8 דק׳ עד שהבצק חלק ומשתחרר מהקערה.',
+  kSpiral: 'לושו במהירות 1 במשך 3–4 דק׳, ואז במהירות 2 במשך 3–5 דק׳ עד שהבצק חלק וגמיש.',
+  sAddLevMx: '{l} מחמצת במהירות נמוכה 2 דק׳. {k} הוסיפו {s} מלח ב-2 הדקות האחרונות, ואז טפטפו פנימה את המים ששמרתם בצד. כוונו לבצק בטמפ׳ {t} ובדקו את מבחן החלון.',
+  sMixAllMx: 'מים, מחמצת ואז קמח במהירות נמוכה 3 דק׳. {k} הוסיפו את המלח ב-2 הדקות האחרונות. כוונו לבצק בטמפ׳ {t}.',
   sFold: 'מתיחה וקיפול, סבב {i} מתוך {n}', sFoldInc: 'זה הזמן לשלב את ה{x}.', sFoldLast: 'מעכשיו השאירו את הבצק מכוסה ובשקט.',
   sBulkEnd: 'סוף ההתפחה, עיצוב מקדים', risePill: 'תפיחה ~{p}%', sBulkEndD: 'התפחה ≈ {d} ב-{t}. תסתמכו על הבצק: מקומר, רוטט, בועות בדפנות. עצבו לכדור והניחו 20–30 דק׳ בלי כיסוי.',
   sShape: 'עיצוב סופי', sShapeD: 'עצבו במתח, והניחו בבנטון מקומח עם התפר כלפי מעלה.',
@@ -765,8 +823,11 @@ he: {
   causesH: 'סיבות אפשריות', fixH: 'נסו בפעם הבאה',
   cats: { All: 'הכול', Crumb: 'פירורית', Shape: 'צורה', Crust: 'קרום', Flavor: 'טעם', Dough: 'בצק', Starter: 'מחמצת' },
   gProcT: 'התהליך מההתחלה ועד הסוף', hydT: 'הידרציה לפי סוג קמח', thTyp: 'הידרציה טיפוסית', thWhy: 'למה',
-  hydRows: [['קמח לבן רגיל', '65–70%', 'פחות חלבון, הבצק נהיה רפוי מהר'], ['קמח לפיצה (00)', '60–70%', 'טחינה דקה, נועד להימתח דק'], ['קמח לחם', '70–78%', 'גלוטן חזק, נקודת פתיחה קלה'], ['+20% קמח מלא', '75–82%', 'הסובין סופג יותר מים'], ['50%+ קמח מלא', '80–88%', 'צריך יותר מים והשריה ארוכה'], ['הרבה שיפון (40%+)', '80–90%', 'הפנטוזנים מחזיקים מים; בצק דביק'], ['כוסמין', '65–72%', 'גלוטן חלש ונמתח']],
+  hydRows: [['קמח לבן רגיל', '65–70%', 'פחות חלבון, הבצק נהיה רפוי מהר'], ['קמח לפיצה (00)', '60–70%', 'טחינה דקה, נועד להימתח דק'], ['קמח לחם', '70–78%', 'גלוטן חזק, נקודת פתיחה קלה'], ['קמח מניטובה', '74–85%', 'הרבה חלבון, סופג יותר מים'], ['קמח T63', '68–75%', 'קמח לחם בהיר (כ-0.63% אפר), עדין ורב-שימושי'], ['+20% קמח מלא', '75–82%', 'הסובין סופג יותר מים'], ['50%+ קמח מלא', '80–88%', 'צריך יותר מים והשריה ארוכה'], ['הרבה שיפון (40%+)', '80–90%', 'הפנטוזנים מחזיקים מים; בצק דביק'], ['כוסמין', '65–72%', 'גלוטן חלש ונמתח']],
   hydTip: 'מתחילים עם מחמצת? התחילו ב-68–72% עם קמח לחם. בצק רטוב קשה יותר לעיצוב, וכיכר של 70% שתססה טוב עדיפה על כיכר של 85% שלא טופלה נכון.',
+  mixT: 'לישה במיקסר',
+  mixList: ['<b>איזה כלי:</b> השתמשו בוו הלישה במיקסר שולחני. מיקסר ספירלי עדין יותר ומתמודד טוב יותר עם בצק רטוב.', '<b>מתחילים לאט:</b> ערבבו את הקמח, רוב המים והמחמצת במהירות נמוכה (1) במשך 2–3 דק׳ עד שאין קמח יבש. אם אפשר, תנו מנוחה של 20–30 דק׳.', '<b>פיתוח הגלוטן:</b> מיקסר שולחני במהירות בינונית-נמוכה (קיצ׳נאייד 2–3, קנווד 1–2) במשך 5–8 דק׳; מיקסר ספירלי במהירות 1 במשך 3–4 דק׳ ואז במהירות 2 במשך 3–5 דק׳. אל תפעילו מיקסר שולחני במהירות גבוהה עם בצק נוקשה, זה מעמיס על המנוע.', '<b>מלח ומים נוספים:</b> הוסיפו את המלח ב-2 הדקות האחרונות. בבצק רטוב, טפטפו לאט את המים ששמרתם בצד במהירות נמוכה (בסינאז׳), רק אחרי שהבצק כבר חזק.', '<b>מתי לעצור:</b> הבצק חלק, מבריק ומנקה את הקערה, וחתיכה קטנה נמתחת דק עד שרואים דרכה אור (מבחן החלון). ללחם עם פירורית פתוחה עצרו קצת קודם ותנו לקיפולים להשלים.', '<b>שימו לב לחום:</b> מיקסר מוסיף 10–15°C של חום חיכוך. בחרו את סוג הלישה (בלשונית טמפ׳ מים או לוח זמנים) כדי שהמים יהיו קרים יותר, ועצרו אם הבצק עובר 27°C.', '<b>פחות קיפולים:</b> בצק שנלש במכונה צריך רק 1–2 סבבים של קיפולי סליל בזמן ההתפחה.'],
+  mixTip: 'כמויות קטנות (פחות מכ-500 ג׳ קמח) נוטות להסתובב סביב הוו במיקסר גדול. לושו אותן ביד או הכפילו את הכמות. קמחים עתירי חלבון כמו מניטובה צריכים לישה ארוכה יותר.',
   bulkT: 'איך יודעים שההתפחה הסתיימה',
   bulkList: ['הנפח גדל לפי תפיחת היעד שבלוח הזמנים. קופסה עם דפנות ישרות וגומייה לסימון מקלות על המדידה.', 'חלק עליון מקומר ותפוח מעט, שמשתחרר בקלות מדפנות הקופסה.', 'בועות על פני הבצק ולאורך הדפנות; הבצק רוטט כשמנערים את הקופסה.', 'הבצק מרגיש אוורירי וקל יותר, כבר לא צפוף ומתוח.'],
   bulkTip: 'צנצנת מדידה עוזרת: שימו חתיכת בצק קטנה בכוסית מיד אחרי הלישה ועקבו אחרי התפיחה שלה.',
@@ -777,7 +838,7 @@ he: {
   process: [
     ['הזנת המחמצת', 'הכינו מחמצת טרייה ממחמצת האם כך שתגיע לשיא בזמן הלישה. ראו את לשונית הכנת המחמצת.'],
     ['אוטוליזה (לא חובה)', 'ערבבו את הקמח ורוב המים והניחו ל-30–60 דק׳. הגלוטן מתחיל להיווצר לבד והבצק נעשה קל יותר לעבודה.'],
-    ['לישה', 'הוסיפו מחמצת בשלה, ואז מלח עם המים ששמרתם בצד. צבטו וקפלו עד שהכול מתאחד. מדדו את טמפרטורת הבצק.'],
+    ['לישה', 'הוסיפו מחמצת בשלה, ואז מלח עם המים ששמרתם בצד. ביד: צבטו וקפלו עד שהכול מתאחד; במיקסר: ראו ״לישה במיקסר״. מדדו את טמפרטורת הבצק.'],
     ['התפחה ראשונה עם קיפולים', 'עשו 3–4 סבבים של מתיחות וקיפולים או קיפולי סליל כל 30 דק׳, ואז השאירו את הבצק. ההתפחה נגמרת לפי הנפח והתחושה, לא לפי השעון.'],
     ['עיצוב מקדים ומנוחה', 'הוציאו את הבצק, עגלו אותו בעדינות, והניחו ל-20–30 דק׳ עד שהוא נרגע ומתפשט מעט.'],
     ['עיצוב סופי', 'צרו מתח על פני הבצק לכיכר עגולה או מאורכת, והניחו בבנטון מקומח עם התפר כלפי מעלה. קמח אורז מונע הידבקות.'],
@@ -824,9 +885,11 @@ const fromC = c => unit === 'C' ? c : c * 9 / 5 + 32;
 const fmtT = c => Math.round(fromC(c)) + '°' + unit;
 const grams = x => (Math.abs(x) < 100 ? (Math.round(x * 10) / 10).toFixed(1) : Math.round(x).toLocaleString('en-US')) + ' ' + t('g');
 const pct = x => (Math.round(x * 10) / 10).toString().replace(/\.0$/, '') + '%';
-const FKEYS = ['bread', 'ap', 'pizza', 'ww', 'rye', 'spelt'];
-const fname = k => t('fl_' + k);
-const FCOLOR = { bread: 'var(--bread)', ww: 'var(--ww)', rye: 'var(--rye)', spelt: 'var(--spelt)', ap: 'var(--ap)', pizza: 'var(--pizza)' };
+const FKEYS = ['bread', 'mani', 't63', 'ap', 'pizza', 'ww', 'rye', 'spelt'];
+const fkeys = () => FKEYS.concat(CF.map(c => c.id));
+const fname = k => { const c = CF.find(x => x.id === k); return c ? c.name : t('fl_' + k); };
+const fcolor = k => FCOLOR[k] || cfColor(CF.findIndex(c => c.id === k));
+const FCOLOR = { bread: 'var(--bread)', mani: 'var(--mani)', t63: 'var(--t63)', ww: 'var(--ww)', rye: 'var(--rye)', spelt: 'var(--spelt)', ap: 'var(--ap)', pizza: 'var(--pizza)' };
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function fmtDur(h){
   const m = Math.round(h * 60); const hh = Math.floor(m / 60), mm = m % 60;
@@ -836,14 +899,14 @@ let F = {};
 
 /* ================= presets ================= */
 const PRESETS = [
-  { hyd: 75, salt: 2, lev: 20, levHyd: 100, ww: 10, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
-  { hyd: 70, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
-  { hyd: 80, salt: 2.1, lev: 15, levHyd: 100, ww: 5, rye: 5, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
-  { hyd: 84, salt: 2, lev: 20, levHyd: 100, ww: 50, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
-  { hyd: 80, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 25, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
-  { hyd: 78, salt: 2.2, lev: 20, levHyd: 100, ww: 15, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 15, incName: '@seed' },
-  { hyd: 68, salt: 2, lev: 20, levHyd: 100, ww: 0, rye: 0, spelt: 0, ap: 100, pizza: 0, inc: 0, incName: '' },
-  { hyd: 65, salt: 2.8, lev: 15, levHyd: 100, ww: 0, rye: 0, spelt: 0, ap: 0, pizza: 100, inc: 0, incName: '', levFlour: 'pizza', loaves: 4, loafWeight: 260 },
+  { hyd: 75, salt: 2, lev: 20, levHyd: 100, mani: 0, ww: 10, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 70, salt: 2, lev: 20, levHyd: 100, mani: 0, ww: 0, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 80, salt: 2.1, lev: 15, levHyd: 100, mani: 0, ww: 5, rye: 5, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 84, salt: 2, lev: 20, levHyd: 100, mani: 0, ww: 50, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 80, salt: 2, lev: 20, levHyd: 100, mani: 0, ww: 0, rye: 25, spelt: 0, ap: 0, pizza: 0, inc: 0, incName: '' },
+  { hyd: 78, salt: 2.2, lev: 20, levHyd: 100, mani: 0, ww: 15, rye: 0, spelt: 0, ap: 0, pizza: 0, inc: 15, incName: '@seed' },
+  { hyd: 68, salt: 2, lev: 20, levHyd: 100, mani: 0, ww: 0, rye: 0, spelt: 0, ap: 100, pizza: 0, inc: 0, incName: '' },
+  { hyd: 65, salt: 2.8, lev: 15, levHyd: 100, mani: 0, ww: 0, rye: 0, spelt: 0, ap: 0, pizza: 100, inc: 0, incName: '', levFlour: 'pizza', loaves: 4, loafWeight: 260 },
 ];
 let presetOn = -1;
 function renderPresets(){
@@ -853,11 +916,54 @@ $('presets').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   const i = +b.dataset.i;
   $('levFlour').value = 'bread';
+  $('t63').value = 0; CF.forEach(c => { c.pct = 0; }); saveCF(); renderCF();
   if (presetOn === PRESETS.length - 1 && i !== presetOn) { $('loaves').value = 2; $('loafWeight').value = 900; }
   Object.entries(PRESETS[i]).forEach(([k, v]) => { $(k).value = v === '@seed' ? t('seedMix') : v; });
   markPreset(i); recalc(); save();
 });
 function markPreset(i){ presetOn = i; $('presets').querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(+c.dataset.i === i))); }
+
+/* ================= custom flours ================= */
+const CF_STORE = 'levain-ledger-flours';
+const CF_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
+let CF = [];
+function cfColor(i){ return CF_COLORS[((i % CF_COLORS.length) + CF_COLORS.length) % CF_COLORS.length]; }
+function cfInfo(c){
+  const p = +c.protein || 0;
+  const gradeOff = { '00': -2, '0': 0, '1': 3, '2': 6, whole: 12 }[c.grade] || 0;
+  const grainOff = { wheat: 0, durum: 3, spelt: -4, rye: 8 }[c.grain] || 0;
+  const whole = ({ '00': 0, '0': 0, '1': 0.3, '2': 0.6, whole: 1 }[c.grade] || 0) * (c.grain === 'spelt' ? 0.5 : 1) + (c.grain === 'rye' ? 0.3 : 0);
+  let str = c.grain === 'rye' || p < 10.5 ? 'weak' : p < 12 ? 'medium' : p < 13.5 ? 'strong' : 'vstrong';
+  if (c.grain === 'spelt' && str !== 'weak') str = 'medium';
+  return { off: clamp(1.5 * (p - 12.5) + gradeOff + grainOff, -10, 24), whole: clamp(whole, 0, 1), str };
+}
+function cfMeta(c){ return t('cfMeta', { g: t('gr_' + c.grade), p: c.protein, s: t('str_' + cfInfo(c).str) }); }
+function loadCF(){ try { CF = JSON.parse(localStorage.getItem(CF_STORE) || '[]'); } catch (e) { CF = []; } if (!Array.isArray(CF)) CF = []; }
+function saveCF(){ try { localStorage.setItem(CF_STORE, JSON.stringify(CF)); } catch (e) {} }
+function renderCF(){
+  $('cfRows').innerHTML = CF.map((c, i) => `<div class="row cf"><label for="cfp-${escapeHtml(c.id)}"><span><span class="sw" style="background:${cfColor(i)}"></span>${escapeHtml(c.name)}</span><small>${escapeHtml(cfMeta(c))}</small></label><div class="field"><input id="cfp-${escapeHtml(c.id)}" type="number" inputmode="decimal" min="0" max="100" step="5" value="${+c.pct || 0}" data-suffix><span class="sfx">%</span></div><button type="button" class="iconbtn" data-rm="${escapeHtml(c.id)}" aria-label="${escapeHtml(t('cfRemove'))}" title="${escapeHtml(t('cfRemove'))}">×</button></div>`).join('');
+  const sel = $('levFlour'), cur = sel.value;
+  sel.querySelectorAll('option[data-cf]').forEach(o => o.remove());
+  CF.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.dataset.cf = '1'; o.textContent = c.name; sel.appendChild(o); });
+  sel.value = [...sel.options].some(o => o.value === cur) ? cur : 'bread';
+}
+function cfDraft(){ return { name: $('cfName').value.trim(), protein: clamp(num('cfProtein'), 5, 20), grade: $('cfGrade').value, grain: $('cfGrain').value }; }
+function renderCFPreview(){ const i = cfInfo(cfDraft()), lo = Math.round(68 + i.off); $('cfPreview').textContent = t('cfPreview', { s: t('str_' + i.str), lo, hi: lo + 8 }); }
+function closeCFForm(){ $('cfForm').hidden = true; $('cfAddBtn').hidden = false; }
+$('cfAddBtn').addEventListener('click', () => { $('cfForm').hidden = false; $('cfAddBtn').hidden = true; renderCFPreview(); $('cfName').focus(); });
+$('cfCancel').addEventListener('click', closeCFForm);
+$('cfSave').addEventListener('click', () => {
+  const d = cfDraft();
+  if (!d.name) d.name = t('gr_' + d.grade) + ' · ' + d.protein + '%';
+  CF.push(Object.assign({ id: 'cf' + Date.now().toString(36), pct: 0 }, d));
+  $('cfName').value = '';
+  saveCF(); renderCF(); closeCFForm(); recalc(); save();
+});
+$('cfRows').addEventListener('click', e => {
+  const b = e.target.closest('[data-rm]'); if (!b) return;
+  CF = CF.filter(c => c.id !== b.dataset.rm);
+  saveCF(); renderCF(); recalc(); save();
+});
 
 /* ================= formula ================= */
 function calcFormula(){
@@ -865,20 +971,21 @@ function calcFormula(){
   $('doughModeFields').hidden = mode !== 'dough';
   $('flourModeFields').hidden = mode !== 'flour';
   const h = num('hyd') / 100, s = num('salt') / 100, l = num('lev') / 100, lh = num('levHyd') / 100, inc = num('inc') / 100;
-  const share = { ww: num('ww') / 100, rye: num('rye') / 100, spelt: num('spelt') / 100, ap: num('ap') / 100, pizza: num('pizza') / 100 };
-  share.bread = 1 - share.ww - share.rye - share.spelt - share.ap - share.pizza;
+  const share = { mani: num('mani') / 100, t63: num('t63') / 100, ww: num('ww') / 100, rye: num('rye') / 100, spelt: num('spelt') / 100, ap: num('ap') / 100, pizza: num('pizza') / 100 };
+  CF.forEach(c => { share[c.id] = (+c.pct || 0) / 100; });
+  share.bread = 1 - Object.values(share).reduce((a, v) => a + v, 0);
   $('breadPct').value = Math.round(share.bread * 1000) / 10;
   const doughTarget = num('loaves') * num('loafWeight');
   const flour = mode === 'dough' ? doughTarget / (1 + h + s + inc) : num('flourTotal');
   const L = flour * l, Lf = L / (1 + lh), Lw = L - Lf;
   const W = flour * h, S = flour * s, I = flour * inc;
   const levFlour = $('levFlour').value;
-  const flours = FKEYS.map(k => {
+  const flours = fkeys().map(k => {
     const total = flour * Math.max(share[k], 0);
     return { k, total, mix: total - (k === levFlour ? Lf : 0), pct: share[k] * 100 };
   });
   F = { mode, flour, h, s, l, lh, L, Lf, Lw, W, S, I, inc, share, flours, levFlour, mixWater: W - Lw,
-        total: flour + W + S + I, wholeFrac: clamp(share.ww + share.rye + share.spelt * 0.5, 0, 1) };
+        total: flour + W + S + I, wholeFrac: clamp(share.ww + share.rye + share.spelt * 0.5 + CF.reduce((a, c) => a + share[c.id] * cfInfo(c).whole, 0), 0, 1) };
 }
 function incLabel(){ return $('incName').value.trim() || t('inclusions'); }
 function renderFormula(){
@@ -892,7 +999,7 @@ function renderFormula(){
 
   let rows = '';
   r.flours.filter(f => f.pct > 0 || (f.k === r.levFlour && r.Lf > 0)).forEach(f => {
-    rows += `<tr><td><span class="sw" style="background:${FCOLOR[f.k]}"></span>${fname(f.k)}</td><td class="n">${pct(f.pct)}</td><td class="n">${grams(f.total)}</td><td class="n mix">${grams(Math.max(f.mix, 0))}</td></tr>`;
+    rows += `<tr><td><span class="sw" style="background:${fcolor(f.k)}"></span>${escapeHtml(fname(f.k))}</td><td class="n">${pct(f.pct)}</td><td class="n">${grams(f.total)}</td><td class="n mix">${grams(Math.max(f.mix, 0))}</td></tr>`;
   });
   rows += `<tr><td><span class="sw" style="background:var(--water)"></span>${t('water')}</td><td class="n">${pct(r.h * 100)}</td><td class="n">${grams(r.W)}</td><td class="n mix">${grams(Math.max(r.mixWater, 0))}</td></tr>`;
   rows += `<tr><td><span class="sw" style="background:var(--salt)"></span>${t('salt')}</td><td class="n">${pct(r.s * 100)}</td><td class="n">${grams(r.S)}</td><td class="n mix">${grams(r.S)}</td></tr>`;
@@ -905,7 +1012,7 @@ function renderFormula(){
   $('sheet').innerHTML = rows;
 
   const segs = [];
-  r.flours.forEach(f => { if (f.total > 0) segs.push([fname(f.k), f.total, FCOLOR[f.k]]); });
+  r.flours.forEach(f => { if (f.total > 0) segs.push([fname(f.k), f.total, fcolor(f.k)]); });
   segs.push([t('water'), r.W, 'var(--water)'], [t('salt'), r.S, 'var(--salt)']);
   if (r.I > 0) segs.push([incLabel(), r.I, 'var(--seed)']);
   const tot = segs.reduce((a, s) => a + s[1], 0) || 1;
@@ -913,10 +1020,10 @@ function renderFormula(){
   $('legend').innerHTML = segs.map(s => `<span><span class="sw" style="background:${s[2]}"></span>${escapeHtml(s[0])} ${Math.round(s[1] / tot * 100)}%</span>`).join('');
 
   const notes = [];
-  const lo = Math.round(68 + 12 * r.share.ww + 18 * r.share.rye - 4 * Math.max(r.share.spelt, 0) - 3 * r.share.ap - 7 * r.share.pizza);
+  const lo = Math.round(68 + 5 * r.share.mani + 1 * r.share.t63 + CF.reduce((a, c) => a + r.share[c.id] * cfInfo(c).off, 0) + 12 * r.share.ww + 18 * r.share.rye - 4 * Math.max(r.share.spelt, 0) - 3 * r.share.ap - 7 * r.share.pizza);
   const hi = lo + 8;
   $('hydHint').textContent = t('hydHint', { lo, hi });
-  const lfName = lang === 'en' ? fname(r.levFlour).toLowerCase() : fname(r.levFlour);
+  const lfName = escapeHtml(lang === 'en' && !/^(t63|mani|cf)/.test(r.levFlour) ? fname(r.levFlour).toLowerCase() : fname(r.levFlour));
   if (r.share.bread < -0.0001) notes.push(['bad', t('nBlendOver')]);
   const lf = r.flours.find(f => f.k === r.levFlour);
   if (lf && lf.mix < -0.5) notes.push(['bad', t('nLevFlour', { f: lfName })]);
@@ -925,6 +1032,8 @@ function renderFormula(){
   if (r.h * 100 < lo - 4) notes.push(['warn', t('nDry')]);
   if (r.s * 100 > (r.share.pizza >= 0.5 ? 3.2 : 2.5)) notes.push(['warn', t('nSaltHi')]);
   if (r.share.pizza >= 0.5) notes.push(['', t('nPizza')]);
+  if (r.share.mani >= 0.5) notes.push(['', t('nMani')]);
+  CF.forEach(c => { if (r.share[c.id] >= 0.3) { const s = cfInfo(c).str; if (s === 'weak') notes.push(['', t('nCfWeak', { f: escapeHtml(c.name) })]); else if (s === 'vstrong') notes.push(['', t('nCfStrong', { f: escapeHtml(c.name) })]); } });
   if (r.share.ap >= 0.5) notes.push(['', t('nAp')]);
   if (r.s > 0 && r.s * 100 < 1.6) notes.push(['warn', t('nSaltLo')]);
   if (r.l * 100 > 30) notes.push(['warn', t('nLevHi')]);
@@ -956,7 +1065,7 @@ $('aLoad').addEventListener('click', () => {
 });
 
 /* ================= saved recipes ================= */
-const RECIPE_FIELDS = ['loaves', 'loafWeight', 'flourTotal', 'hyd', 'salt', 'lev', 'levHyd', 'levFlour', 'ww', 'rye', 'spelt', 'ap', 'pizza', 'incName', 'inc'];
+const RECIPE_FIELDS = ['loaves', 'loafWeight', 'flourTotal', 'hyd', 'salt', 'lev', 'levHyd', 'levFlour', 'mani', 't63', 'ww', 'rye', 'spelt', 'ap', 'pizza', 'incName', 'inc'];
 let store = { kind: 'pending' }; // pending | cloud | local
 let recipes = [];
 function readLocalRecipes(){ try { return JSON.parse(localStorage.getItem(RECIPES_LOCAL) || '[]'); } catch (e) { return []; } }
@@ -988,6 +1097,7 @@ $('rSave').addEventListener('click', async () => {
   if (!name) { setStatus(t('rNeedName'), 'err'); $('rName').focus(); return; }
   const values = {}; RECIPE_FIELDS.forEach(id => values[id] = $(id).value);
   values.mode = $('modeFlour').checked ? 'flour' : 'dough';
+  values.customFlours = CF.map(c => Object.assign({}, c));
   const existing = recipes.find(r => (r.name || '').trim().toLowerCase() === name.toLowerCase());
   const id = existing ? existing.id : 'r-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const body = { kind: 'recipe', name, notes: $('rNotes').value.trim(), values, total: Math.round(F.total), savedAt: Date.now() };
@@ -1035,7 +1145,11 @@ $('recipeList').addEventListener('click', async e => {
   const r = recipes.find(x => x.id === id); if (!r) return;
   if (b.dataset.act === 'load') {
     const v = r.values || {};
-    RECIPE_FIELDS.forEach(k => { if (v[k] !== undefined) $(k).value = v[k]; });
+    RECIPE_FIELDS.forEach(k => { if (v[k] !== undefined) $(k).value = v[k]; else if (k === 'mani' || k === 't63') $(k).value = 0; });
+    CF.forEach(c => { c.pct = 0; });
+    (Array.isArray(v.customFlours) ? v.customFlours : []).forEach(rc => { const ex = CF.find(c => c.id === rc.id); if (ex) Object.assign(ex, rc); else CF.push(Object.assign({}, rc)); });
+    saveCF(); renderCF();
+    if (v.levFlour) $('levFlour').value = v.levFlour;
     $(v.mode === 'flour' ? 'modeFlour' : 'modeDough').checked = true;
     $('rName').value = r.name || ''; $('rNotes').value = r.notes || '';
     markPreset(-1); recalc(); save();
@@ -1115,6 +1229,8 @@ function renderWater(){
     const d = parseFloat(o.value) * (unit === 'C' ? 1 : 9 / 5);
     o.textContent = t('frFmt', { l: labels[o.value], d: Math.round(d) + '°' + unit });
   });
+  [...$('schMix').options].forEach(o => { o.textContent = labels[o.value]; });
+  $('schMix').value = $('friction').value;
 }
 
 /* ================= schedule ================= */
@@ -1144,15 +1260,17 @@ function renderSchedule(){
   const retard = clamp(num('schRetard'), 0, 72), cool = clamp(num('schCool'), 0, 600);
   const levH = peakHours(num('rS'), num('rF'), num('rW'), toC(num('levTemp')));
   const rise = Math.round(targetRise(tC) / 5) * 5;
+  const mixer = parseFloat($('friction').value) >= 10;
+  const knead = $('friction').value === '15' ? t('kSpiral') : t('kStand');
 
   const steps = [];
   const bulkStart = auto;
   steps.push({ m: bulkStart - levH * 60, t: t('sFeed', { r: `<bdi>${num('rS')}:${num('rF')}:${num('rW')}</bdi>` }), d: t('sFeedD', { g: grams(F.L + num('levKeep')), t: fmtT(toC(num('levTemp'))), d: fmtDur(levH) }), key: true });
   if (auto > 0) {
     steps.push({ m: 0, t: t('sAuto'), d: t('sAutoD', { f: grams(F.flours.reduce((a, f) => a + Math.max(f.mix, 0), 0)), w: grams(Math.max(F.mixWater * 0.94, 0)) }), key: true });
-    steps.push({ m: auto, t: t('sAddLev'), d: t('sAddLevD', { l: grams(F.L), s: grams(F.S), t: fmtT(tC) }), key: true });
+    steps.push({ m: auto, t: t('sAddLev'), d: mixer ? t('sAddLevMx', { l: grams(F.L), s: grams(F.S), t: fmtT(tC), k: knead }) : t('sAddLevD', { l: grams(F.L), s: grams(F.S), t: fmtT(tC) }), key: true });
   } else {
-    steps.push({ m: 0, t: t('sMixAll'), d: t('sMixAllD', { t: fmtT(tC) }), key: true });
+    steps.push({ m: 0, t: t('sMixAll'), d: mixer ? t('sMixAllMx', { t: fmtT(tC), k: knead }) : t('sMixAllD', { t: fmtT(tC) }), key: true });
   }
   for (let i = 1; i <= folds; i++) {
     steps.push({ m: bulkStart + i * gap, t: t('sFold', { i, n: folds }), d: i === 1 && F.I > 0 ? t('sFoldInc', { x: escapeHtml(incLabel()) }) : (i === folds ? t('sFoldLast') : ''), minor: true });
@@ -1226,7 +1344,7 @@ function applyStatic(){
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
   document.querySelectorAll('[data-i18n-list]').forEach(el => { el.innerHTML = t(el.dataset.i18nList).map(x => `<li>${x}</li>`).join(''); });
   document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
-  renderPresets();
+  renderPresets(); renderCF();
 }
 function setLang(l){
   if (!STR[l]) return;
@@ -1246,6 +1364,7 @@ function save(){
   try {
     const values = {};
     document.querySelectorAll('main input[id], main select[id], main textarea[id]').forEach(el => {
+      if (el.id.startsWith('cf')) return;
       values[el.id] = (el.type === 'radio' || el.type === 'checkbox') ? el.checked : el.value;
     });
     localStorage.setItem(STORE, JSON.stringify({ values, unit, lang }));
@@ -1276,13 +1395,20 @@ function setUnit(u, convert = true){
 }
 document.querySelectorAll('[data-unit]').forEach(b => b.addEventListener('click', () => { setUnit(b.dataset.unit); recalc(); save(); }));
 
-const FORMULA_IDS = ['hyd', 'salt', 'lev', 'levHyd', 'ww', 'rye', 'spelt', 'ap', 'pizza', 'inc', 'incName'];
+const FORMULA_IDS = ['hyd', 'salt', 'lev', 'levHyd', 'mani', 'ww', 'rye', 'spelt', 'ap', 'pizza', 'inc', 'incName'];
 document.querySelector('main').addEventListener('input', e => {
+  const id = e.target.id || '';
+  if (id === 'schMix') $('friction').value = e.target.value;
+  if (id.startsWith('cfp-')) { const c = CF.find(x => 'cfp-' + x.id === id); if (c) { c.pct = num(id); saveCF(); } markPreset(-1); recalc(); save(); return; }
+  if (id.startsWith('cf')) { renderCFPreview(); return; }
   if (e.target.id === 'rName' || e.target.id === 'rNotes') { save(); return; }
   if (FORMULA_IDS.includes(e.target.id)) markPreset(-1);
   recalc(); save();
 });
 document.querySelector('main').addEventListener('change', e => {
+  const cid = e.target.id || '';
+  if (cid === 'schMix') $('friction').value = e.target.value;
+  if (cid.startsWith('cf')) { if (!cid.startsWith('cfp-')) renderCFPreview(); return; }
   if (e.target.id === 'rName' || e.target.id === 'rNotes') return;
   recalc(); save();
 });
@@ -1296,6 +1422,7 @@ function showTab(name){
 }
 tabs.forEach(tb => tb.addEventListener('click', () => showTab(tb.dataset.tab)));
 
+loadCF(); renderCF();
 const restored = load();
 if (!restored) {
   const nav = (navigator.language || '').toLowerCase();
@@ -1311,5 +1438,4 @@ initRecipes();
 })();
 </script>
 
-</body>
-</html>
+</body></html>
